@@ -11,7 +11,7 @@ const highlights = [
   {
     icon: FiVideo,
     title: "Live classes",
-    text: "Interactive sessions with tutors, doubt clearing, and Jitsi-powered video rooms.",
+    text: "Interactive sessions with tutors, doubt clearing, and built-in video rooms.",
   },
   {
     icon: FiUsers,

@@ -5,7 +5,7 @@ const LiveClassesPage = () => (
   <div>
     <PageHeader
       title="Live classes"
-      subtitle="Join any scheduled batch session via embedded Jitsi Meet."
+      subtitle="Join any scheduled batch session via IndLearn video."
     />
     <LiveClassesPanel title="" />
   </div>

@@ -30,7 +30,7 @@ const TutorMeetingsPage = () => {
     <div>
       <h1 className="text-2xl font-bold mb-2">Doubt & meeting requests</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-6">
-        Students request doubt clearance or meetings. Accept to open chat + Jitsi video with them.
+        Students request doubt clearance or meetings. Accept to open chat + video with them.
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">

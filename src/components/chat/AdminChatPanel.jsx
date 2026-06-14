@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { io } from "socket.io-client";
 import { chatService } from "../../services/chatService";
 import Button from "../common/Button";
-import JitsiRoom from "../video/JitsiRoom";
+import IndLearnVideoRoom from "../video/IndLearnVideoRoom";
 import { ROLE_LABELS } from "../../utils/constants";
 
 const SOCKET_URL =
@@ -377,18 +377,20 @@ const AdminChatPanel = () => {
                     : ""}
                 </p>
               </div>
-              {videoRoom?.roomName && (
+              {videoRoom?.roomId && (
                 <Button type="button" onClick={() => setShowVideo((v) => !v)}>
-                  {showVideo ? "Hide video" : "Video"}
+                  {showVideo ? "Hide video" : "Video call"}
                 </Button>
               )}
             </div>
-            {showVideo && videoRoom?.roomName && (
-              <div className="h-56 shrink-0 p-2">
-                <JitsiRoom
-                  roomName={videoRoom.roomName}
+            {showVideo && videoRoom?.roomId && (
+              <div className="h-72 shrink-0 p-2">
+                <IndLearnVideoRoom
+                  roomId={videoRoom.roomId || videoRoom.roomName}
                   displayName={user.name}
+                  iceServers={videoRoom.iceServers}
                   className="h-full"
+                  onLeave={() => setShowVideo(false)}
                 />
               </div>
             )}

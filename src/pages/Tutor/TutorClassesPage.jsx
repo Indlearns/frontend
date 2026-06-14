@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { tutorService } from "../../services/tutorService";
-import JitsiRoom from "../../components/video/JitsiRoom";
+import IndLearnVideoRoom from "../../components/video/IndLearnVideoRoom";
 import Button from "../../components/common/Button";
 
 const TutorClassesPage = () => {
@@ -41,7 +41,7 @@ const TutorClassesPage = () => {
     <div>
       <h1 className="text-2xl font-bold mb-2">Live classes</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-6">
-        Classes created by admin for your batches. Join the Jitsi room when it is time to teach.
+        Classes created by admin for your batches. Join the video room when it is time to teach.
       </p>
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="glass-card p-4 space-y-3 max-h-[70vh] overflow-y-auto">
@@ -69,7 +69,7 @@ const TutorClassesPage = () => {
               )}
               <div className="flex gap-2 mt-3 flex-wrap">
                 <Button type="button" onClick={() => join(c)}>
-                  Join Jitsi room
+                  Join video class
                 </Button>
                 {c.status === "live" && (
                   <Button type="button" variant="outline" onClick={() => markDone(c._id)}>
@@ -84,10 +84,15 @@ const TutorClassesPage = () => {
           )}
         </div>
         <div className="glass-card min-h-[360px] flex flex-col p-2">
-          {video?.roomName ? (
+          {video?.roomId ? (
             <>
               <p className="p-3 font-semibold text-sm">{active?.title}</p>
-              <JitsiRoom roomName={video.roomName} displayName={user.name} className="flex-1 min-h-[320px]" />
+              <IndLearnVideoRoom
+                roomId={video.roomId || video.roomName}
+                displayName={user.name}
+                iceServers={video.iceServers}
+                className="flex-1 min-h-[320px]"
+              />
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center text-slate-500 p-6 text-center text-sm">

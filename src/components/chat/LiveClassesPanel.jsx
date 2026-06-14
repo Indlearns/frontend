@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { chatService } from "../../services/chatService";
-import JitsiRoom from "../video/JitsiRoom";
+import IndLearnVideoRoom from "../video/IndLearnVideoRoom";
 import Button from "../common/Button";
 
 const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
@@ -52,7 +52,7 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
               </p>
               <p className="text-xs text-slate-500 mt-1 capitalize">Status: {c.status}</p>
               <Button type="button" className="mt-3" onClick={() => joinClass(c)}>
-                Join with Jitsi
+                Join video class
               </Button>
             </div>
           ))}
@@ -61,18 +61,19 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
           )}
         </div>
         <div className="glass-card p-2 min-h-[360px] flex flex-col">
-          {video?.roomName ? (
+          {video?.roomId ? (
             <>
               <p className="p-3 font-semibold text-sm">{active?.title}</p>
-              <JitsiRoom
-                roomName={video.roomName}
+              <IndLearnVideoRoom
+                roomId={video.roomId || video.roomName}
                 displayName={user.name}
+                iceServers={video.iceServers}
                 className="flex-1 min-h-[320px]"
               />
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center text-slate-500 p-6 text-center">
-              Select a class and click Join with Jitsi to enter the video room.
+              Select a class and click Join video class.
             </div>
           )}
         </div>

@@ -124,7 +124,7 @@ const HomePage = () => {
                     <p className="font-bold text-sm font-semibold text-slate-800 dark:text-slate-200">
                       Live & chat
                     </p>
-                    <p className="text-xs text-slate-500">Jitsi + messaging</p>
+                    <p className="text-xs text-slate-500">Built-in video + messaging</p>
                   </div>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { chatService } from "../../services/chatService";
 import Button from "../common/Button";
-import JitsiRoom from "../video/JitsiRoom";
+import IndLearnVideoRoom from "../video/IndLearnVideoRoom";
 
 const SOCKET_URL =
   import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
@@ -145,15 +145,21 @@ const ChatPanel = ({ title = "Messages", subtitle, showNewChat = true }) => {
             <>
               <div className="p-3 border-b border-brand-100 flex items-center justify-between gap-2">
                 <p className="font-semibold text-sm truncate">{activeConv?.title}</p>
-                {videoRoom?.roomName && (
+                {videoRoom?.roomId && (
                   <Button type="button" onClick={() => setShowVideo((v) => !v)}>
-                    {showVideo ? "Hide video" : "Video call (Jitsi)"}
+                    {showVideo ? "Hide video" : "Video call"}
                   </Button>
                 )}
               </div>
-              {showVideo && videoRoom?.roomName && (
-                <div className="h-64 md:h-80 shrink-0 p-2">
-                  <JitsiRoom roomName={videoRoom.roomName} displayName={user.name} className="h-full" />
+              {showVideo && videoRoom?.roomId && (
+                <div className="h-72 md:h-96 shrink-0 p-2">
+                  <IndLearnVideoRoom
+                    roomId={videoRoom.roomId || videoRoom.roomName}
+                    displayName={user.name}
+                    iceServers={videoRoom.iceServers}
+                    className="h-full"
+                    onLeave={() => setShowVideo(false)}
+                  />
                 </div>
               )}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">

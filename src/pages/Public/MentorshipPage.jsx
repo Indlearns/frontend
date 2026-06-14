@@ -24,7 +24,7 @@ const MentorshipPage = () => {
           {
             icon: FiVideo,
             title: "Video doubt sessions",
-            text: "Request a session and join a Jitsi room when your tutor accepts.",
+            text: "Request a session and join a video room when your tutor accepts.",
           },
           {
             icon: FiUsers,
