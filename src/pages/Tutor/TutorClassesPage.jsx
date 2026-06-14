@@ -85,15 +85,17 @@ const TutorClassesPage = () => {
         </div>
         <div className="glass-card min-h-[360px] flex flex-col p-2">
           {video?.roomId ? (
-            <>
-              <p className="p-3 font-semibold text-sm">{active?.title}</p>
-              <IndLearnVideoRoom
-                roomId={video.roomId || video.roomName}
-                displayName={user.name}
-                iceServers={video.iceServers}
-                className="flex-1 min-h-[320px]"
-              />
-            </>
+            <IndLearnVideoRoom
+              roomId={video.roomId || video.roomName}
+              displayName={user.name}
+              iceServers={video.iceServers}
+              title={active?.title}
+              className="flex-1 min-h-[320px]"
+              onLeave={() => {
+                setActive(null);
+                setVideo(null);
+              }}
+            />
           ) : (
             <div className="flex-1 flex items-center justify-center text-slate-500 p-6 text-center text-sm">
               Select a class and join the video room.

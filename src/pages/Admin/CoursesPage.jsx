@@ -8,6 +8,7 @@ import {
   formatPrice,
   formatEnrollmentCloseDate,
   toDateInputValue,
+  isFreePrice,
 } from "../../utils/media";
 
 const emptyForm = {
@@ -34,6 +35,13 @@ const CoursesPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [enrollmentsCourseId, setEnrollmentsCourseId] = useState(null);
+  const [filter, setFilter] = useState("all");
+
+  const filteredCourses = courses.filter((c) => {
+    if (filter === "free") return isFreePrice(c);
+    if (filter === "paid") return !isFreePrice(c);
+    return true;
+  });
 
   const load = async () => {
     const r = await adminService.getCourses();
@@ -122,7 +130,7 @@ const CoursesPage = () => {
     <div>
       <PageHeader
         title="Courses"
-        subtitle="Upload image, set price (INR), and open courses on the public site. Edit any course including open ones."
+        subtitle="Create, edit, and delete courses — free (price 0) and paid. Open courses can be edited anytime."
       />
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -231,9 +239,27 @@ const CoursesPage = () => {
         </form>
 
         <div className="glass-card p-6">
-          <h2 className="font-bold text-lg mb-4">All courses ({courses.length})</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h2 className="font-bold text-lg">All courses ({filteredCourses.length})</h2>
+            <div className="flex gap-1 text-sm">
+              {["all", "free", "paid"].map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setFilter(key)}
+                  className={`px-3 py-1 rounded-lg capitalize ${
+                    filter === key
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600"
+                  }`}
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
+          </div>
           <ul className="space-y-4 max-h-[600px] overflow-y-auto">
-            {courses.map((c) => (
+            {filteredCourses.map((c) => (
               <li
                 key={c._id}
                 className={`p-4 rounded-xl border flex flex-wrap gap-3 ${
@@ -261,6 +287,11 @@ const CoursesPage = () => {
                     <span className="text-xs px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 capitalize">
                       {statusLabel(c.status)}
                     </span>
+                    {isFreePrice(c) && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                        Free
+                      </span>
+                    )}
                     {c.enrollmentCloseDate && (
                       <span className="text-xs text-slate-500">
                         Closes {formatEnrollmentCloseDate(c.enrollmentCloseDate)}

@@ -5,6 +5,7 @@ import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
 import IndLearnVideoRoom from "../../components/video/IndLearnVideoRoom";
 import { WEEKDAYS, previewScheduleDates } from "../../utils/scheduleDates";
+import { toDateInputValue } from "../../utils/media";
 
 const emptyForm = {
   batch: "",
@@ -28,6 +29,7 @@ const SchedulePage = () => {
   const [activeClass, setActiveClass] = useState(null);
   const [video, setVideo] = useState(null);
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -68,6 +70,35 @@ const SchedulePage = () => {
     }));
   };
 
+  const resetForm = () => {
+    setForm(emptyForm);
+    setEditingId(null);
+    setError("");
+    setMessage("");
+  };
+
+  const startEdit = (schedule) => {
+    setEditingId(schedule._id);
+    setForm({
+      batch: schedule.batch?._id || schedule.batch || "",
+      title: schedule.title || "",
+      mode: "single",
+      date: toDateInputValue(schedule.date),
+      fromDate: "",
+      toDate: "",
+      weekdays: [1, 2, 3, 4, 5],
+      extraDate: "",
+      extraDates: [],
+      startTime: schedule.startTime || "09:00",
+      endTime: schedule.endTime || "11:00",
+      meetLink: schedule.meetLink || "",
+      notes: schedule.notes || "",
+    });
+    setError("");
+    setMessage("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const buildPayload = () => {
     const base = {
       batch: form.batch,
@@ -98,6 +129,29 @@ const SchedulePage = () => {
     setLoading(true);
 
     try {
+      if (editingId) {
+        const payload = {
+          batch: form.batch,
+          title: form.title,
+          date: form.date,
+          startTime: form.startTime,
+          endTime: form.endTime,
+          meetLink: form.meetLink,
+          notes: form.notes,
+        };
+        if (!form.date) {
+          setError("Select a class date.");
+          return;
+        }
+        const r = await adminService.updateSchedule(editingId, payload);
+        if (r.success) {
+          setMessage("Class updated.");
+          resetForm();
+          load();
+        }
+        return;
+      }
+
       if (previewDates.length === 0) {
         setError("Select at least one class date.");
         return;
@@ -106,11 +160,11 @@ const SchedulePage = () => {
       const r = await adminService.createSchedule(buildPayload());
       if (r.success) {
         setMessage(r.message || `${r.count} class(es) scheduled.`);
-        setForm(emptyForm);
+        resetForm();
         load();
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Could not schedule classes.");
+      setError(err.response?.data?.message || "Could not save class.");
     } finally {
       setLoading(false);
     }
@@ -123,6 +177,7 @@ const SchedulePage = () => {
       setActiveClass(null);
       setVideo(null);
     }
+    if (editingId === id) resetForm();
     load();
   };
 
@@ -158,7 +213,20 @@ const SchedulePage = () => {
       />
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
-          <h2 className="font-bold text-lg">Schedule classes</h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-bold text-lg">
+              {editingId ? "Edit class" : "Schedule classes"}
+            </h2>
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="text-sm text-slate-500 hover:text-brand-600"
+              >
+                Cancel edit
+              </button>
+            )}
+          </div>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
           {message && <p className="text-brand-600 text-sm">{message}</p>}
@@ -191,32 +259,34 @@ const SchedulePage = () => {
             className="input-field"
           />
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, mode: "single" })}
-              className={`flex-1 py-2 rounded-xl text-sm font-medium border ${
-                form.mode === "single"
-                  ? "bg-brand-600 text-white border-brand-600"
-                  : "border-brand-200 text-slate-600"
-              }`}
-            >
-              Single day
-            </button>
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, mode: "range" })}
-              className={`flex-1 py-2 rounded-xl text-sm font-medium border ${
-                form.mode === "range"
-                  ? "bg-brand-600 text-white border-brand-600"
-                  : "border-brand-200 text-slate-600"
-              }`}
-            >
-              Date range (month)
-            </button>
-          </div>
+          {!editingId && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, mode: "single" })}
+                className={`flex-1 py-2 rounded-xl text-sm font-medium border ${
+                  form.mode === "single"
+                    ? "bg-brand-600 text-white border-brand-600"
+                    : "border-brand-200 text-slate-600"
+                }`}
+              >
+                Single day
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, mode: "range" })}
+                className={`flex-1 py-2 rounded-xl text-sm font-medium border ${
+                  form.mode === "range"
+                    ? "bg-brand-600 text-white border-brand-600"
+                    : "border-brand-200 text-slate-600"
+                }`}
+              >
+                Date range (month)
+              </button>
+            </div>
+          )}
 
-          {form.mode === "single" ? (
+          {editingId || form.mode === "single" ? (
             <input
               type="date"
               required
@@ -330,7 +400,7 @@ const SchedulePage = () => {
             </div>
           </div>
 
-          {previewDates.length > 0 && (
+          {previewDates.length > 0 && !editingId && (
             <div className="rounded-xl bg-brand-50 dark:bg-brand-950/30 p-3 text-sm">
               <p className="font-medium text-brand-800 dark:text-brand-200">
                 {previewDates.length} class{previewDates.length === 1 ? "" : "es"} at{" "}
@@ -355,12 +425,17 @@ const SchedulePage = () => {
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             className="input-field min-h-[80px]"
           />
-          <Button type="submit" disabled={loading || previewDates.length === 0}>
+          <Button
+            type="submit"
+            disabled={loading || (!editingId && previewDates.length === 0) || (editingId && !form.date)}
+          >
             {loading
-              ? "Scheduling..."
-              : previewDates.length > 1
-                ? `Schedule ${previewDates.length} classes`
-                : "Schedule class"}
+              ? "Saving..."
+              : editingId
+                ? "Save changes"
+                : previewDates.length > 1
+                  ? `Schedule ${previewDates.length} classes`
+                  : "Schedule class"}
           </Button>
         </form>
 
@@ -369,7 +444,14 @@ const SchedulePage = () => {
             <h2 className="font-bold text-lg mb-4">Upcoming classes ({upcoming.length})</h2>
             <ul className="space-y-3 max-h-[400px] overflow-y-auto">
               {upcoming.map((s) => (
-                <li key={s._id} className="p-4 rounded-xl border border-brand-100">
+                <li
+                  key={s._id}
+                  className={`p-4 rounded-xl border ${
+                    editingId === s._id
+                      ? "border-brand-500 bg-brand-50/50 dark:bg-brand-950/20"
+                      : "border-brand-100"
+                  }`}
+                >
                   <p className="font-semibold">{s.title}</p>
                   <p className="text-sm text-slate-500">
                     {s.batch?.name} · {new Date(s.date).toLocaleDateString()}
@@ -384,6 +466,13 @@ const SchedulePage = () => {
                     <Button type="button" onClick={() => handleJoin(s)}>
                       {s.status === "scheduled" ? "Start & join" : "Join class"}
                     </Button>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(s)}
+                      className="text-brand-600 text-xs hover:underline self-center"
+                    >
+                      Edit
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(s._id)}
@@ -409,18 +498,20 @@ const SchedulePage = () => {
             </ul>
           </div>
 
-          <div className="glass-card p-2 min-h-[320px] flex flex-col">
-            {video?.roomId ? (
-              <>
-                <p className="p-3 font-semibold text-sm">{activeClass?.title}</p>
-                <IndLearnVideoRoom
-                  roomId={video.roomId || video.roomName}
-                  displayName={user.name}
-                  iceServers={video.iceServers}
-                  className="flex-1 min-h-[280px]"
-                />
-              </>
-            ) : (
+        <div className="glass-card p-2 min-h-[320px] flex flex-col">
+          {video?.roomId ? (
+            <IndLearnVideoRoom
+              roomId={video.roomId || video.roomName}
+              displayName={user.name}
+              iceServers={video.iceServers}
+              title={activeClass?.title}
+              className="flex-1 min-h-[280px]"
+              onLeave={() => {
+                setActiveClass(null);
+                setVideo(null);
+              }}
+            />
+          ) : (
               <div className="flex-1 flex items-center justify-center text-slate-500 p-6 text-center text-sm">
                 Select a class and click Start & join to enter the video room.
               </div>
