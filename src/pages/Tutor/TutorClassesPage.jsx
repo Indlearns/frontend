@@ -69,7 +69,7 @@ const TutorClassesPage = () => {
               )}
               <div className="flex gap-2 mt-3 flex-wrap">
                 <Button type="button" onClick={() => join(c)}>
-                  Join video class
+                  {c.status === "scheduled" ? "Start & join class" : "Join class"}
                 </Button>
                 {c.status === "live" && (
                   <Button type="button" variant="outline" onClick={() => markDone(c._id)}>

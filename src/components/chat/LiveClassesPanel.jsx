@@ -17,9 +17,12 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
 
   const joinClass = async (schedule) => {
     setActive(schedule);
-    const r = await chatService.getLiveClassVideo(schedule._id);
+    const r = await chatService.joinLiveClass(schedule._id);
     if (r.success) setVideo(r.data);
   };
+
+  const joinLabel = (status) =>
+    status === "scheduled" ? "Start & join class" : "Join class";
 
   const formatDate = (d) =>
     new Date(d).toLocaleDateString(undefined, {
@@ -51,8 +54,11 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
                 {c.batch?.name} · {formatDate(c.date)} · {c.startTime}–{c.endTime}
               </p>
               <p className="text-xs text-slate-500 mt-1 capitalize">Status: {c.status}</p>
+              {c.participants?.length > 0 && (
+                <p className="text-xs text-slate-500">{c.participants.length} participants</p>
+              )}
               <Button type="button" className="mt-3" onClick={() => joinClass(c)}>
-                Join video class
+                {joinLabel(c.status)}
               </Button>
             </div>
           ))}

@@ -18,6 +18,8 @@ export const chatService = {
     api.post(`/chat/conversations/${id}/messages`, { content }).then((r) => r.data),
   getVideoConfig: (id) => api.get(`/chat/conversations/${id}/video`).then((r) => r.data),
   getLiveClasses: () => api.get("/chat/live-classes").then((r) => r.data),
+  joinLiveClass: (scheduleId) =>
+    api.post(`/chat/live-classes/${scheduleId}/join`).then((r) => r.data),
   getLiveClassVideo: (scheduleId) =>
-    api.get(`/chat/live-classes/${scheduleId}/video`).then((r) => r.data),
+    api.post(`/chat/live-classes/${scheduleId}/join`).then((r) => r.data),
 };

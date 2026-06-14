@@ -5,7 +5,7 @@ const LiveClassesPage = () => (
   <div>
     <PageHeader
       title="Live classes"
-      subtitle="Join any scheduled batch session via IndLearn video."
+      subtitle="Join any scheduled batch session. Admin and participants can start the class."
     />
     <LiveClassesPanel title="" />
   </div>
