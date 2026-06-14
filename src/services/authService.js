@@ -29,4 +29,14 @@ export const authService = {
     const response = await api.get("/auth/me");
     return response.data;
   },
+
+  requestSuperAdminCode: async (email) => {
+    const response = await api.post("/auth/superadmin/request-code", { email });
+    return response.data;
+  },
+
+  verifySuperAdminCode: async (email, code) => {
+    const response = await api.post("/auth/superadmin/verify-code", { email, code });
+    return response.data;
+  },
 };
