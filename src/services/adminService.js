@@ -54,6 +54,8 @@ export const adminService = {
     api.get("/admin/schedules", { params: batchId ? { batch: batchId } : {} }).then((r) => r.data),
   updateSchedule: (id, data) => api.put(`/admin/schedules/${id}`, data).then((r) => r.data),
   deleteSchedule: (id) => api.delete(`/admin/schedules/${id}`).then((r) => r.data),
+  deleteScheduleGroup: (groupId) =>
+    api.delete(`/admin/schedules/group/${groupId}`).then((r) => r.data),
 
   getConversations: () => api.get("/admin/conversations").then((r) => r.data),
   joinConversation: (id) => api.post(`/admin/conversations/${id}/join`).then((r) => r.data),

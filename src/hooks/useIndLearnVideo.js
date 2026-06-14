@@ -16,18 +16,39 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [joined, setJoined] = useState(false);
+  const [localSocketId, setLocalSocketId] = useState("");
+  const [handRaised, setHandRaised] = useState(false);
+  const [raisedHands, setRaisedHands] = useState({});
+  const [chatMessages, setChatMessages] = useState([]);
+  const [showChat, setShowChat] = useState(false);
 
   const socketRef = useRef(null);
   const pcsRef = useRef(new Map());
   const localStreamRef = useRef(null);
   const iceServersRef = useRef(DEFAULT_ICE);
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
     iceServersRef.current = iceServers?.length ? iceServers : DEFAULT_ICE;
   }, [iceServers]);
 
+  useEffect(() => {
+    if (showChat) chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages, showChat]);
+
   const updatePeers = useCallback((updater) => {
     setPeers((prev) => (typeof updater === "function" ? updater(prev) : updater));
+  }, []);
+
+  const setHandForSocket = useCallback((socketId, name, raised) => {
+    setRaisedHands((prev) => {
+      if (!raised) {
+        const next = { ...prev };
+        delete next[socketId];
+        return next;
+      }
+      return { ...prev, [socketId]: { name, raised: true } };
+    });
   }, []);
 
   const removePeer = useCallback(
@@ -38,8 +59,9 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
         pcsRef.current.delete(socketId);
       }
       updatePeers((prev) => prev.filter((p) => p.socketId !== socketId));
+      setHandForSocket(socketId, "", false);
     },
-    [updatePeers]
+    [updatePeers, setHandForSocket]
   );
 
   const createPeerConnection = useCallback(
@@ -142,6 +164,11 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
     setLocalStream(null);
     setPeers([]);
     setJoined(false);
+    setLocalSocketId("");
+    setHandRaised(false);
+    setRaisedHands({});
+    setChatMessages([]);
+    setShowChat(false);
   }, [roomId]);
 
   useEffect(() => {
@@ -165,12 +192,18 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
         socketRef.current = socket;
 
         socket.on("connect", () => {
+          setLocalSocketId(socket.id);
           socket.emit("join_video_room", { roomId, displayName });
           setJoined(true);
         });
 
         socket.on("video_room_users", ({ users }) => {
-          users.forEach((u) => createPeerConnection(u.socketId, u.name, true));
+          const hands = {};
+          users.forEach((u) => {
+            if (u.handRaised) hands[u.socketId] = { name: u.name, raised: true };
+            createPeerConnection(u.socketId, u.name, true);
+          });
+          setRaisedHands(hands);
         });
 
         socket.on("video_user_joined", ({ user: u }) => {
@@ -181,6 +214,24 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
 
         socket.on("video_signal", ({ from, signal, user: u }) => {
           handleSignal(from, signal, u?.name);
+        });
+
+        socket.on("video_hand_update", ({ socketId, name, raised }) => {
+          if (socketId === socket.id) return;
+          setHandForSocket(socketId, name, raised);
+        });
+
+        socket.on("video_chat_history", ({ messages }) => {
+          if (Array.isArray(messages)) setChatMessages(messages);
+        });
+
+        socket.on("video_chat_message", ({ message }) => {
+          if (message) {
+            setChatMessages((prev) => {
+              if (prev.some((m) => m.id === message.id)) return prev;
+              return [...prev, message];
+            });
+          }
         });
 
         socket.on("connect_error", () => setError("Could not connect to video server."));
@@ -199,7 +250,16 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
       mounted = false;
       cleanup();
     };
-  }, [enabled, roomId, displayName, createPeerConnection, handleSignal, removePeer, cleanup]);
+  }, [
+    enabled,
+    roomId,
+    displayName,
+    createPeerConnection,
+    handleSignal,
+    removePeer,
+    cleanup,
+    setHandForSocket,
+  ]);
 
   const toggleMic = () => {
     const track = localStreamRef.current?.getAudioTracks()[0];
@@ -217,5 +277,43 @@ export const useIndLearnVideo = ({ roomId, displayName, iceServers, enabled }) =
     }
   };
 
-  return { peers, localStream, error, micOn, camOn, joined, toggleMic, toggleCam, leave: cleanup };
+  const toggleRaiseHand = () => {
+    const next = !handRaised;
+    setHandRaised(next);
+    if (localSocketId) {
+      setHandForSocket(localSocketId, displayName, next);
+    }
+    socketRef.current?.emit("video_raise_hand", { roomId, raised: next });
+  };
+
+  const sendChatMessage = (text) => {
+    const trimmed = text?.trim();
+    if (!trimmed || !socketRef.current) return;
+    socketRef.current.emit("video_chat_message", { roomId, text: trimmed });
+  };
+
+  const isHandRaised = (socketId) =>
+    Boolean(raisedHands[socketId]?.raised) || (socketId === localSocketId && handRaised);
+
+  return {
+    peers,
+    localStream,
+    localSocketId,
+    error,
+    micOn,
+    camOn,
+    joined,
+    handRaised,
+    raisedHands,
+    isHandRaised,
+    chatMessages,
+    showChat,
+    setShowChat,
+    chatEndRef,
+    toggleMic,
+    toggleCam,
+    toggleRaiseHand,
+    sendChatMessage,
+    leave: cleanup,
+  };
 };
