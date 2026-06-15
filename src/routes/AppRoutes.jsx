@@ -91,6 +91,45 @@ const AppRoutes = () => (
       <Route path="staff-admins" element={<StaffAdminsPage />} />
     </Route>
 
+    <Route
+      path="/tutor"
+      element={
+        <ProtectedRoute allowedRoles={[ROLES.TUTOR]}>
+          <TutorLayout />
+        </ProtectedRoute>
+      }
+    >
+      <Route index element={<TutorOverviewPage />} />
+      <Route path="batches" element={<TutorBatchesPage />} />
+      <Route path="chat" element={<TutorChatPage />} />
+      <Route path="classes" element={<TutorClassesPage />} />
+      <Route path="assignments" element={<TutorAssignmentsPage />} />
+      <Route path="meetings" element={<TutorMeetingsPage />} />
+    </Route>
+
+    <Route
+      path="/student"
+      element={
+        <ProtectedRoute allowedRoles={[ROLES.STUDENT]}>
+          <StudentEnrolledRoute>
+            <StudentLayout />
+          </StudentEnrolledRoute>
+        </ProtectedRoute>
+      }
+    >
+      <Route index element={<StudentOverviewPage />} />
+      <Route path="courses" element={<StudentMyCoursesPage />} />
+      <Route path="courses/:batchId" element={<StudentCourseDashboardPage />} />
+      <Route path="progress" element={<StudentProgressPage />} />
+      <Route path="career" element={<StudentCareerPage />} />
+      <Route path="profile" element={<StudentProfilePage />} />
+      <Route path="resume" element={<StudentResumePage />} />
+      <Route path="chat" element={<StudentChatPage />} />
+      <Route path="classes" element={<StudentClassesPage />} />
+      <Route path="assignments" element={<StudentAssignmentsPage />} />
+      <Route path="meetings" element={<StudentMeetingsPage />} />
+    </Route>
+
     <Route element={<Layout />}>
       <Route index element={<HomePage />} />
       <Route path="login" element={<LoginPage />} />
@@ -110,43 +149,6 @@ const AppRoutes = () => (
       <Route path="refund" element={<RefundPolicyPage />} />
       <Route path="about" element={<AboutPage />} />
       <Route path="contact" element={<ContactPage />} />
-      <Route
-        path="tutor"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.TUTOR]}>
-            <TutorLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<TutorOverviewPage />} />
-        <Route path="batches" element={<TutorBatchesPage />} />
-        <Route path="chat" element={<TutorChatPage />} />
-        <Route path="classes" element={<TutorClassesPage />} />
-        <Route path="assignments" element={<TutorAssignmentsPage />} />
-        <Route path="meetings" element={<TutorMeetingsPage />} />
-      </Route>
-      <Route
-        path="student"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.STUDENT]}>
-            <StudentEnrolledRoute>
-              <StudentLayout />
-            </StudentEnrolledRoute>
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<StudentOverviewPage />} />
-        <Route path="courses" element={<StudentMyCoursesPage />} />
-        <Route path="courses/:batchId" element={<StudentCourseDashboardPage />} />
-        <Route path="progress" element={<StudentProgressPage />} />
-        <Route path="career" element={<StudentCareerPage />} />
-        <Route path="profile" element={<StudentProfilePage />} />
-        <Route path="resume" element={<StudentResumePage />} />
-        <Route path="chat" element={<StudentChatPage />} />
-        <Route path="classes" element={<StudentClassesPage />} />
-        <Route path="assignments" element={<StudentAssignmentsPage />} />
-        <Route path="meetings" element={<StudentMeetingsPage />} />
-      </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   </Routes>

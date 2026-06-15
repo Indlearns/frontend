@@ -93,9 +93,14 @@ const HomePage = () => {
                     </Button>
                   </Link>
                 ) : !isAuthenticated ? (
-                  <Link to="/register">
-                    <Button variant="outline">Create account</Button>
-                  </Link>
+                  <>
+                    <Link to="/login">
+                      <Button variant="outline">Sign in</Button>
+                    </Link>
+                    <Link to="/register">
+                      <Button variant="ghost">Join free</Button>
+                    </Link>
+                  </>
                 ) : null}
               </div>
             </motion.div>

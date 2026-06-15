@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import Logo from "../../common/Logo";
 import ThemeToggle from "../../layout/ThemeToggle";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -61,8 +61,12 @@ const StudentLayout = () => {
             </NavLink>
           ))}
         </nav>
-        <div className="px-4 py-4 border-t border-brand-100 dark:border-slate-800">
-          <p className="text-xs text-slate-500 mb-2 truncate">{user?.email}</p>
+        <div className="px-4 py-4 border-t border-brand-100 dark:border-slate-800 space-y-3">
+          <div className="hidden lg:flex items-center justify-between">
+            <span className="text-xs text-slate-500">Theme</span>
+            <ThemeToggle />
+          </div>
+          <p className="text-xs text-slate-500 truncate">{user?.email}</p>
           <button
             type="button"
             onClick={logout}
@@ -74,27 +78,17 @@ const StudentLayout = () => {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 w-full">
-        <header className="sticky top-0 z-30 h-14 border-b border-brand-100 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur shrink-0">
+        <header className="lg:hidden sticky top-0 z-30 h-14 border-b border-brand-100 dark:border-slate-800 flex items-center justify-between px-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur shrink-0">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="p-2 lg:hidden text-slate-700 dark:text-slate-200"
+            className="p-2 text-slate-700 dark:text-slate-200"
             aria-label="Open menu"
           >
             <FiMenu size={22} />
           </button>
-          <div className="hidden lg:block" />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 lg:hidden"
-              aria-label="Close menu"
-            >
-              <FiX size={22} className={sidebarOpen ? "text-slate-700 dark:text-slate-200" : "invisible"} />
-            </button>
-          </div>
+          <Logo variant="sidebar" to="/student" />
+          <ThemeToggle />
         </header>
         <main className="flex-1 p-4 sm:p-6 overflow-auto w-full max-w-full">
           <Outlet />
