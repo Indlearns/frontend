@@ -26,14 +26,14 @@ const StudentMyCoursesPage = () => {
   ]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-2">My courses</h1>
-      <p className="text-slate-600 dark:text-slate-400 mb-8">
+    <div className="max-w-4xl">
+      <h1 className="text-xl sm:text-2xl font-bold mb-2">My courses</h1>
+      <p className="text-slate-600 dark:text-slate-400 mb-6 sm:mb-8 text-sm sm:text-base">
         Courses you enrolled in via payment and live batch programs assigned by admin.
       </p>
 
       <h2 className="font-bold text-lg mb-4">Enrolled courses</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
         {purchasedCourses.map((p) => (
           <Link
             key={p.course._id}
@@ -91,7 +91,7 @@ const StudentMyCoursesPage = () => {
       </div>
 
       <h2 className="font-bold text-lg mb-4">Browse more courses</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {browse
           .filter((c) => !enrolledIds.has(String(c._id)))
           .map((c) => (

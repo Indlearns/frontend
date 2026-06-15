@@ -12,6 +12,7 @@ import {
   formatEnrollmentCloseDate,
   isEnrollmentClosed,
 } from "../../utils/media";
+import FormattedDescription from "../../components/common/FormattedDescription";
 
 const CourseDetailContent = ({ course, onReload }) => {
   const purchase = useRazorpayPurchase({
@@ -64,9 +65,9 @@ const CourseDetailContent = ({ course, onReload }) => {
       )}
 
       {course.description && (
-        <p className="mt-6 text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-          {course.description}
-        </p>
+        <div className="mt-6">
+          <FormattedDescription text={course.description} />
+        </div>
       )}
 
       <PurchaseStatus enrollment={purchase} />

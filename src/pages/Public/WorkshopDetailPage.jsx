@@ -12,6 +12,7 @@ import {
   isRegistrationClosed,
 } from "../../utils/media";
 import { resolveWorkshopPurchaseType } from "../../utils/purchaseFlow";
+import FormattedDescription from "../../components/common/FormattedDescription";
 
 const WorkshopDetailContent = ({ workshop, onReload }) => {
   const purchaseType = resolveWorkshopPurchaseType(workshop);
@@ -65,9 +66,9 @@ const WorkshopDetailContent = ({ workshop, onReload }) => {
       </div>
 
       {workshop.description && (
-        <p className="mt-6 text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-          {workshop.description}
-        </p>
+        <div className="mt-6">
+          <FormattedDescription text={workshop.description} />
+        </div>
       )}
 
       <PurchaseStatus enrollment={flow} meetLink={flow.hasAccess ? workshop.meetLink : null} />

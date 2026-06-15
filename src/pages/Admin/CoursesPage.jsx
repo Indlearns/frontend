@@ -180,7 +180,7 @@ const CoursesPage = () => {
           />
           <textarea
             required
-            placeholder="Description"
+            placeholder="Description — use headings (# Title or Title:), bullets (- item), numbered lists (1. item)"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="input-field min-h-[100px]"

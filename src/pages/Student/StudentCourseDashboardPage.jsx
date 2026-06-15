@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { studentService } from "../../services/studentService";
 import Button from "../../components/common/Button";
 import { FiBookOpen, FiCalendar, FiMessageCircle, FiVideo } from "react-icons/fi";
+import FormattedDescription from "../../components/common/FormattedDescription";
 
 const StudentCourseDashboardPage = () => {
   const { batchId } = useParams();
@@ -26,9 +27,9 @@ const StudentCourseDashboardPage = () => {
       <h1 className="text-2xl font-bold mt-2">{batch.course?.title}</h1>
       <p className="text-brand-600 text-sm">{batch.name}</p>
       {batch.course?.description && (
-        <p className="text-slate-600 dark:text-slate-400 mt-3 max-w-2xl">
-          {batch.course.description}
-        </p>
+        <div className="mt-3 max-w-2xl">
+          <FormattedDescription text={batch.course.description} />
+        </div>
       )}
 
       <div className="glass-card p-5 mt-6">

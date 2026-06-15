@@ -39,9 +39,9 @@ const StudentOverviewPage = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
-      <p className="text-slate-600 dark:text-slate-400 mb-8">
+    <div className="max-w-4xl">
+      <h1 className="text-xl sm:text-2xl font-bold mb-2">Welcome back</h1>
+      <p className="text-slate-600 dark:text-slate-400 mb-6 sm:mb-8 text-sm sm:text-base">
         You have access to {totalCount} course{totalCount !== 1 ? "s" : ""}.
         {batchCourses.length > 0
           ? " Open a batch dashboard for live classes, assignments, and chat."
@@ -51,12 +51,12 @@ const StudentOverviewPage = () => {
       {purchasedCourses.length > 0 && (
         <div className="mb-8">
           <h2 className="font-bold text-lg mb-4">Your enrolled courses</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {purchasedCourses.map((p) => (
               <Link
                 key={p.course._id}
                 to={`/courses/${p.course._id}`}
-                className="glass-card p-5 hover:border-brand-500 block"
+                className="glass-card p-4 sm:p-5 hover:border-brand-500 block w-full"
               >
                 {p.course.thumbnail && (
                   <img
@@ -77,7 +77,7 @@ const StudentOverviewPage = () => {
       )}
 
       {batchCourses.length > 0 && (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {batchCourses.slice(0, 3).map((e) => (
             <Link
               key={e.batch._id}
@@ -91,22 +91,28 @@ const StudentOverviewPage = () => {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <Link to="/student/courses">
-          <Button>My courses</Button>
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+        <Link to="/student/courses" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto">My courses</Button>
         </Link>
         {batchCourses.length > 0 && (
           <>
-            <Link to="/student/progress">
-              <Button variant="outline">My progress</Button>
+            <Link to="/student/progress" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full sm:w-auto">
+                My progress
+              </Button>
             </Link>
-            <Link to="/student/career">
-              <Button variant="outline">Career</Button>
+            <Link to="/student/career" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full sm:w-auto">
+                Career
+              </Button>
             </Link>
           </>
         )}
-        <Link to="/courses">
-          <Button variant="outline">Browse more courses</Button>
+        <Link to="/courses" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto">
+            Browse more courses
+          </Button>
         </Link>
       </div>
     </div>

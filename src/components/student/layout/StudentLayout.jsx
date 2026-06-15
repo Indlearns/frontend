@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { FiMenu, FiX } from "react-icons/fi";
 import Logo from "../../common/Logo";
 import ThemeToggle from "../../layout/ThemeToggle";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -17,11 +19,31 @@ const nav = [
 ];
 
 const StudentLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+
+  const linkClass = ({ isActive }) =>
+    `block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+      isActive
+        ? "bg-brand-500 text-white"
+        : "text-slate-700 dark:text-slate-300 hover:bg-brand-50 dark:hover:bg-brand-950/30"
+    }`;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
-      <aside className="w-64 shrink-0 border-r border-brand-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      <aside
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 border-r border-brand-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col transform transition-transform lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="px-4 pt-5 pb-4 border-b border-brand-100 dark:border-slate-800">
           <Logo variant="sidebar" to="/student" />
           <p className="mt-2 text-xs text-slate-500">Student portal</p>
@@ -32,13 +54,8 @@ const StudentLayout = () => {
               key={item.to}
               to={item.to}
               end={item.end}
-              className={({ isActive }) =>
-                `block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-brand-500 text-white"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-brand-50 dark:hover:bg-brand-950/30"
-                }`
-              }
+              className={linkClass}
+              onClick={() => setSidebarOpen(false)}
             >
               {item.label}
             </NavLink>
@@ -55,11 +72,31 @@ const StudentLayout = () => {
           </button>
         </div>
       </aside>
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-brand-100 dark:border-slate-800 flex items-center justify-end px-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur shrink-0">
-          <ThemeToggle />
+
+      <div className="flex-1 flex flex-col min-w-0 w-full">
+        <header className="sticky top-0 z-30 h-14 border-b border-brand-100 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur shrink-0">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 lg:hidden text-slate-700 dark:text-slate-200"
+            aria-label="Open menu"
+          >
+            <FiMenu size={22} />
+          </button>
+          <div className="hidden lg:block" />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 lg:hidden"
+              aria-label="Close menu"
+            >
+              <FiX size={22} className={sidebarOpen ? "text-slate-700 dark:text-slate-200" : "invisible"} />
+            </button>
+          </div>
         </header>
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-4 sm:p-6 overflow-auto w-full max-w-full">
           <Outlet />
         </main>
       </div>
