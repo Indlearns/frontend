@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
-import { FiGithub, FiLinkedin, FiTwitter, FiMail } from "react-icons/fi";
+import { FiLinkedin, FiMail, FiPhone, FiInstagram } from "react-icons/fi";
 import Logo from "../common/Logo";
-import { APP_NAME } from "../../utils/constants";
+import { APP_NAME, CONTACT, SOCIAL_LINKS } from "../../utils/constants";
+
+const socialIcon = {
+  linkedin: FiLinkedin,
+  instagram: FiInstagram,
+};
 
 /**
- * Site footer - links, social icons, copyright
+ * Site footer - links, contact, social icons, copyright
  */
 const Footer = () => {
   const footerLinks = {
@@ -35,21 +40,44 @@ const Footer = () => {
               Empowering learners with world-class education, mentorship, and
               career-ready skills. Build your future with {APP_NAME}.
             </p>
-            <div className="flex gap-4 mt-6">
-              {[FiTwitter, FiLinkedin, FiGithub].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="p-2 rounded-lg bg-brand-900 hover:bg-brand-500 text-brand-200 hover:text-white transition-colors"
-                  aria-label="Social link"
-                >
-                  <Icon size={18} />
-                </a>
-              ))}
+
+            <div className="mt-5 space-y-2 text-sm">
               <a
-                href="mailto:support@indlearns.com"
+                href={`mailto:${CONTACT.email}`}
+                className="flex items-center gap-2 text-brand-200/90 hover:text-white transition-colors"
+              >
+                <FiMail size={16} className="shrink-0" />
+                {CONTACT.email}
+              </a>
+              <a
+                href={`tel:${CONTACT.phoneTel}`}
+                className="flex items-center gap-2 text-brand-200/90 hover:text-white transition-colors"
+              >
+                <FiPhone size={16} className="shrink-0" />
+                {CONTACT.phoneDisplay}
+              </a>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              {SOCIAL_LINKS.map((social) => {
+                const Icon = socialIcon[social.icon] || FiLinkedin;
+                return (
+                  <a
+                    key={social.href}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-brand-900 hover:bg-brand-500 text-brand-200 hover:text-white transition-colors"
+                    aria-label={social.label}
+                  >
+                    <Icon size={18} />
+                  </a>
+                );
+              })}
+              <a
+                href={`mailto:${CONTACT.email}`}
                 className="p-2 rounded-lg bg-brand-900 hover:bg-brand-500 text-brand-200 hover:text-white transition-colors"
-                aria-label="Email support"
+                aria-label="Email us"
               >
                 <FiMail size={18} />
               </a>

@@ -10,6 +10,29 @@ export const ROLES = {
 
 export const SUPER_ADMIN_EMAIL = "official@indlearns.com";
 
+/** Public support & contact (footer, contact page, legal) */
+export const CONTACT = {
+  email: "official@indlearns.com",
+  phone: "9606991651",
+  phoneTel: "+919606991651",
+  phoneDisplay: "+91 96069 91651",
+  linkedin: "https://www.linkedin.com/company/indlearns",
+  instagram: "https://www.instagram.com/ind.learns",
+};
+
+export const SOCIAL_LINKS = [
+  {
+    label: "LinkedIn",
+    href: CONTACT.linkedin,
+    icon: "linkedin",
+  },
+  {
+    label: "Instagram",
+    href: CONTACT.instagram,
+    icon: "instagram",
+  },
+];
+
 /** Private URLs — bookmark only, not on public menu */
 export const SUPERADMIN_LOGIN_PATH = "/superadmin/login";
 export const ADMIN_LOGIN_PATH = "/admins/login";

@@ -1,4 +1,6 @@
 /** Legal copy for INDLearns — Last updated shown on each page */
+import { CONTACT } from "../utils/constants";
+
 export const LEGAL_LAST_UPDATED = "May 22, 2026";
 
 export const privacyPolicy = {
@@ -88,7 +90,8 @@ export const privacyPolicy = {
       heading: "10. Contact Us",
       paragraphs: [
         "For any privacy-related concerns, contact:",
-        "Email: support@indlearns.com",
+        `Email: ${CONTACT.email}`,
+        `Phone: ${CONTACT.phoneDisplay}`,
         "INDLearns",
       ],
     },
@@ -185,7 +188,8 @@ export const termsAndConditions = {
       heading: "12. Contact",
       paragraphs: [
         "For questions regarding these Terms, contact:",
-        "Email: support@indlearns.com",
+        `Email: ${CONTACT.email}`,
+        `Phone: ${CONTACT.phoneDisplay}`,
       ],
     },
   ],
@@ -239,7 +243,7 @@ export const refundPolicy = {
     {
       heading: "7. Contact for Refunds",
       paragraphs: [
-        "For refund-related requests, contact: support@indlearns.com",
+        `For refund-related requests, contact: ${CONTACT.email} or call ${CONTACT.phoneDisplay}.`,
         "Include: Full Name, Registered Email Address, Transaction ID, Course Name, and Reason for Request.",
       ],
     },

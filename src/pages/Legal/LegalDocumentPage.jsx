@@ -1,5 +1,46 @@
 import { Link } from "react-router-dom";
 import { LEGAL_LAST_UPDATED } from "../../content/policies";
+import { CONTACT } from "../../utils/constants";
+
+const linkPatterns = [
+  {
+    match: CONTACT.email,
+    render: (key) => (
+      <a key={key} href={`mailto:${CONTACT.email}`} className="text-brand-600 hover:underline">
+        {CONTACT.email}
+      </a>
+    ),
+  },
+  {
+    match: CONTACT.phoneDisplay,
+    render: (key) => (
+      <a key={key} href={`tel:${CONTACT.phoneTel}`} className="text-brand-600 hover:underline">
+        {CONTACT.phoneDisplay}
+      </a>
+    ),
+  },
+  {
+    match: CONTACT.phone,
+    render: (key) => (
+      <a key={key} href={`tel:${CONTACT.phoneTel}`} className="text-brand-600 hover:underline">
+        {CONTACT.phone}
+      </a>
+    ),
+  },
+];
+
+const renderParagraph = (text) => {
+  const pattern = linkPatterns.find((p) => text.includes(p.match));
+  if (!pattern) return text;
+
+  const parts = text.split(pattern.match);
+  const nodes = [];
+  parts.forEach((part, i) => {
+    if (part) nodes.push(part);
+    if (i < parts.length - 1) nodes.push(pattern.render(`link-${i}`));
+  });
+  return nodes;
+};
 
 const LegalDocumentPage = ({ document }) => {
   const { title, sections } = document;
@@ -29,20 +70,7 @@ const LegalDocumentPage = ({ document }) => {
                 key={i}
                 className="text-slate-700 dark:text-slate-300 leading-relaxed mb-3"
               >
-                {p.includes("support@indlearns.com") ? (
-                  <>
-                    {p.split("support@indlearns.com")[0]}
-                    <a
-                      href="mailto:support@indlearns.com"
-                      className="text-brand-600 hover:underline"
-                    >
-                      support@indlearns.com
-                    </a>
-                    {p.split("support@indlearns.com")[1]}
-                  </>
-                ) : (
-                  p
-                )}
+                {renderParagraph(p)}
               </p>
             ))}
             {section.list?.length > 0 && (
@@ -56,7 +84,20 @@ const LegalDocumentPage = ({ document }) => {
         ))}
       </div>
 
-      <div className="mt-12 pt-8 border-t border-brand-100 dark:border-slate-800 flex flex-wrap gap-4 text-sm">
+      <div className="mt-12 pt-8 border-t border-brand-100 dark:border-slate-800">
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">Contact</p>
+        <p className="text-sm text-slate-700 dark:text-slate-300">
+          <a href={`mailto:${CONTACT.email}`} className="text-brand-600 hover:underline">
+            {CONTACT.email}
+          </a>
+          {" · "}
+          <a href={`tel:${CONTACT.phoneTel}`} className="text-brand-600 hover:underline">
+            {CONTACT.phoneDisplay}
+          </a>
+        </p>
+      </div>
+
+      <div className="mt-8 pt-8 border-t border-brand-100 dark:border-slate-800 flex flex-wrap gap-4 text-sm">
         <Link to="/privacy" className="text-brand-600 hover:underline">
           Privacy Policy
         </Link>

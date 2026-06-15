@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { FiBookOpen, FiUsers, FiVideo, FiAward } from "react-icons/fi";
 import Button from "../../components/common/Button";
+import { CONTACT } from "../../utils/constants";
 
 const highlights = [
   {
@@ -64,6 +65,40 @@ const AboutPage = () => (
         we are here to support your journey with transparency, secure payments, and a
         platform you can trust.
       </p>
+    </div>
+
+    <div className="glass-card p-6 lg:p-8 mt-8 max-w-3xl">
+      <h2 className="font-bold text-lg mb-3">Get in touch</h2>
+      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+        Questions about courses, enrollment, or partnerships? Contact our team.
+      </p>
+      <div className="flex flex-col sm:flex-row flex-wrap gap-4 text-sm">
+        <a
+          href={`mailto:${CONTACT.email}`}
+          className="text-brand-600 hover:underline font-medium"
+        >
+          {CONTACT.email}
+        </a>
+        <a href={`tel:${CONTACT.phoneTel}`} className="text-brand-600 hover:underline font-medium">
+          {CONTACT.phoneDisplay}
+        </a>
+        <a
+          href={CONTACT.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand-600 hover:underline font-medium"
+        >
+          LinkedIn
+        </a>
+        <a
+          href={CONTACT.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand-600 hover:underline font-medium"
+        >
+          Instagram
+        </a>
+      </div>
     </div>
 
     <div className="mt-12 flex flex-wrap gap-4">
