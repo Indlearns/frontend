@@ -50,6 +50,7 @@ import TermsPage from "../pages/Legal/TermsPage";
 import RefundPolicyPage from "../pages/Legal/RefundPolicyPage";
 import AboutPage from "../pages/Public/AboutPage";
 import ContactPage from "../pages/Public/ContactPage";
+import NotFoundPage from "../pages/NotFoundPage";
 import PartnerLoginPage from "../pages/Auth/PartnerLoginPage";
 import PartnerLayout from "../components/partner/layout/PartnerLayout";
 import PartnerOverviewPage from "../pages/Partner/PartnerOverviewPage";
