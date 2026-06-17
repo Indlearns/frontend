@@ -30,7 +30,7 @@ const CoursesPage = () => {
           Courses
         </h1>
         <p className="mt-3 text-slate-600 dark:text-slate-400">
-          Open courses from IndLearn. Tap a course or Enroll now to see full details, then pay with Razorpay.
+          Open courses from IndLearn. Tap a course or Enroll now to see full details, then pay with PayPal.
         </p>
         <p className="mt-4">
           <Link to="/login" className="text-brand-600 font-medium hover:underline">

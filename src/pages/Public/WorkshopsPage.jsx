@@ -20,7 +20,7 @@ const WorkshopsPage = () => {
       <div className="max-w-3xl mb-8">
         <h1 className="font-display text-3xl lg:text-4xl font-bold">Workshops</h1>
         <p className="mt-3 text-slate-600 dark:text-slate-400">
-          Upcoming workshops from IndLearn. Open an event and pay with Razorpay to register.
+          Upcoming workshops from IndLearn. Open an event and pay with PayPal to register.
         </p>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">

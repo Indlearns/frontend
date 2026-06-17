@@ -3,7 +3,8 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { publicService } from "../../services/publicService";
 import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-import { useRazorpayPurchase } from "../../hooks/useRazorpayPurchase";
+import PayPalCheckout from "../../components/payment/PayPalCheckout";
+import { usePayPalPurchase } from "../../hooks/usePayPalPurchase";
 import { getPurchaseType } from "../../utils/purchaseFlow";
 import {
   getImageUrl,
@@ -18,10 +19,9 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   const navigate = useNavigate();
   const flow = getPurchaseType(purchaseType);
 
-  const purchase = useRazorpayPurchase({
+  const purchase = usePayPalPurchase({
     purchaseType,
     item,
-    preloadScript: true,
     onSuccess: () => {
       onComplete();
       if (purchaseType !== "course") {
@@ -124,19 +124,19 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         ) : (
           <>
             <p className="text-sm text-slate-500 mt-4">
-              Secure payment via Razorpay. Click below to open the payment window.
+              Secure payment via PayPal. Use the button below to complete your purchase.
             </p>
             {purchase.configLoading && (
-              <p className="text-sm text-slate-500 mt-3">Connecting to Razorpay...</p>
+              <p className="text-sm text-slate-500 mt-3">Connecting to PayPal...</p>
             )}
             {!purchase.configLoading && purchase.gatewayReady && purchase.testMode && (
               <p className="text-sm text-amber-700 mt-3 rounded-lg bg-amber-50 px-3 py-2">
-                Test mode — card 4111 1111 1111 1111, any future expiry, any CVV.
+                Sandbox mode — use your PayPal sandbox buyer account to test payments.
               </p>
             )}
             {!purchase.configLoading && !purchase.gatewayReady && (
               <p className="text-sm text-amber-600 mt-3">
-                Razorpay is not configured. Add keys to backend .env and restart the server.
+                PayPal is not configured. Add credentials to backend .env and restart the server.
               </p>
             )}
           </>
@@ -144,18 +144,26 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
 
         {purchase.error && <p className="text-sm text-red-600 mt-3">{purchase.error}</p>}
 
-        <Button
-          type="button"
-          className="w-full mt-6 py-3"
-          disabled={payDisabled}
-          onClick={purchase.handlePurchase}
-        >
-          {purchase.loading || purchase.configLoading
-            ? "Please wait..."
-            : purchase.isFree
-              ? flow.freeLabel
-              : flow.payLabel}
-        </Button>
+        {purchase.isFree ? (
+          <Button
+            type="button"
+            className="w-full mt-6 py-3"
+            disabled={payDisabled}
+            onClick={purchase.handlePurchase}
+          >
+            {purchase.loading || purchase.configLoading ? "Please wait..." : flow.freeLabel}
+          </Button>
+        ) : (
+          <PayPalCheckout
+            clientId={purchase.clientId}
+            currency={purchase.currency}
+            disabled={payDisabled || purchase.loading}
+            createOrder={purchase.createPayPalOrder}
+            onApprove={purchase.handlePayPalApprove}
+            onError={purchase.handlePayPalError}
+            onCancel={purchase.handlePayPalCancel}
+          />
+        )}
 
         <Link
           to={flow.detailPath(item._id)}
@@ -240,7 +248,7 @@ const CheckoutPage = () => {
         ← Back to details
       </Link>
       <h1 className="font-display text-3xl font-bold mt-4">{TYPE_LABELS[type]}</h1>
-      <p className="text-slate-600 mt-2">Review your order and pay with Razorpay to continue.</p>
+      <p className="text-slate-600 mt-2">Review your order and pay with PayPal to continue.</p>
       <CheckoutContent purchaseType={type} item={item} onComplete={load} />
     </div>
   );

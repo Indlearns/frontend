@@ -52,7 +52,7 @@ const StudentMyCoursesPage = () => {
             <p className="text-sm text-brand-600 font-medium mt-2">
               {formatPrice(p.course.price, p.course.currency)}
             </p>
-            <p className="text-xs text-green-700 mt-2">Enrolled · Razorpay</p>
+            <p className="text-xs text-green-700 mt-2">Enrolled · PayPal</p>
           </Link>
         ))}
         {batchEnrolled.map((e) => (
@@ -85,7 +85,7 @@ const StudentMyCoursesPage = () => {
         {!purchasedCourses.length && !batchEnrolled.length && (
           <EmptyState
             title="No courses yet"
-            hint="Browse open courses and enroll with Razorpay to get started."
+            hint="Browse open courses and enroll with PayPal to get started."
           />
         )}
       </div>

@@ -5,7 +5,7 @@ import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import PurchaseButton from "../../components/payment/PurchaseButton";
 import PurchaseStatus from "../../components/payment/PurchaseStatus";
-import { useRazorpayPurchase } from "../../hooks/useRazorpayPurchase";
+import { usePayPalPurchase } from "../../hooks/usePayPalPurchase";
 import {
   formatPrice,
   formatRegistrationCloseDate,
@@ -16,7 +16,7 @@ import FormattedDescription from "../../components/common/FormattedDescription";
 
 const WorkshopDetailContent = ({ workshop, onReload }) => {
   const purchaseType = resolveWorkshopPurchaseType(workshop);
-  const flow = useRazorpayPurchase({
+  const flow = usePayPalPurchase({
     purchaseType,
     item: workshop,
     onSuccess: onReload,
@@ -83,7 +83,7 @@ const WorkshopDetailContent = ({ workshop, onReload }) => {
           </p>
           {!flow.isFree && (
             <p className="text-sm text-slate-500 mb-4">
-              Paid events are completed via Razorpay at checkout.
+              Paid events are completed via PayPal at checkout.
             </p>
           )}
           <PurchaseButton

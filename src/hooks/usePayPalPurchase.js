@@ -6,26 +6,6 @@ import { useStudentEnrollment } from "./useStudentEnrollment";
 import { isEnrollmentClosed, isRegistrationClosed, isFreePrice } from "../utils/media";
 import { getPurchaseType } from "../utils/purchaseFlow";
 
-export const loadRazorpayScript = () =>
-  new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-    const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
-    if (existing) {
-      existing.addEventListener("load", () => resolve(Boolean(window.Razorpay)));
-      existing.addEventListener("error", () => resolve(false));
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    script.onload = () => resolve(Boolean(window.Razorpay));
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-
 const HOOK_CONFIG = {
   course: {
     closed: isEnrollmentClosed,
@@ -37,10 +17,8 @@ const HOOK_CONFIG = {
     createOrder: (id) => paymentService.createCourseOrder(id),
     checkAccess: (id) => paymentService.checkCourseAccess(id),
     verify: (data) => paymentService.verifyCoursePayment(data),
-    verifyPayload: (response, itemId) => ({
-      razorpay_order_id: response.razorpay_order_id,
-      razorpay_payment_id: response.razorpay_payment_id,
-      razorpay_signature: response.razorpay_signature,
+    verifyPayload: (orderId, itemId) => ({
+      orderId,
       courseId: itemId,
     }),
   },
@@ -54,24 +32,21 @@ const HOOK_CONFIG = {
     createOrder: (id) => paymentService.createWorkshopOrder(id),
     checkAccess: (id) => paymentService.checkWorkshopAccess(id),
     verify: (data) => paymentService.verifyWorkshopPayment(data),
-    verifyPayload: (response, itemId) => ({
-      razorpay_order_id: response.razorpay_order_id,
-      razorpay_payment_id: response.razorpay_payment_id,
-      razorpay_signature: response.razorpay_signature,
+    verifyPayload: (orderId, itemId) => ({
+      orderId,
       workshopId: itemId,
     }),
   },
 };
 
 /**
- * Unified Razorpay purchase hook for courses, workshops, and hackathons.
+ * Unified PayPal purchase hook for courses, workshops, and hackathons.
  * @param purchaseType - "course" | "workshop" | "hackathon" (hackathon uses workshop API)
  */
-export const useRazorpayPurchase = ({
+export const usePayPalPurchase = ({
   purchaseType,
   item,
   onSuccess,
-  preloadScript = false,
 }) => {
   const flow = getPurchaseType(purchaseType);
   const apiType = flow?.apiType;
@@ -89,11 +64,13 @@ export const useRazorpayPurchase = ({
   const [gatewayReady, setGatewayReady] = useState(false);
   const [configLoading, setConfigLoading] = useState(true);
   const [testMode, setTestMode] = useState(false);
+  const [clientId, setClientId] = useState("");
   const [error, setError] = useState("");
   const payingRef = useRef(false);
 
   const isFree = isFreePrice(item);
   const isClosed = item ? cfg.closed(item) : false;
+  const currency = item?.currency || "INR";
 
   useEffect(() => {
     let cancelled = false;
@@ -104,6 +81,7 @@ export const useRazorpayPurchase = ({
         if (cancelled) return;
         setGatewayReady(Boolean(r.success && r.data.enabled));
         setTestMode(Boolean(r.success && r.data.testMode));
+        setClientId(r.success ? r.data.clientId || "" : "");
       })
       .catch(() => {
         if (!cancelled) setGatewayReady(false);
@@ -115,10 +93,6 @@ export const useRazorpayPurchase = ({
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    if (preloadScript && !isFree) loadRazorpayScript();
-  }, [preloadScript, isFree]);
 
   const refreshAccess = useCallback(async () => {
     if (!isAuthenticated || user?.role !== "student" || !item?._id) {
@@ -155,73 +129,80 @@ export const useRazorpayPurchase = ({
     refreshAccess();
   }, [refreshAccess]);
 
-  const openRazorpayCheckout = useCallback(
-    async (orderRes) => {
-      const { orderId, amount, currency, keyId, item: orderItem } = orderRes.data;
+  const createPayPalOrder = useCallback(async () => {
+    if (!item?._id) {
+      throw new Error("Item not found.");
+    }
 
-      if (!orderId || !keyId || !amount) {
-        setError("Invalid payment response. Please try again.");
-        setLoading(false);
-        payingRef.current = false;
-        return;
+    setError("");
+    setLoading(true);
+    payingRef.current = true;
+
+    try {
+      const orderRes = await cfg.createOrder(item._id);
+
+      if (orderRes.data?.alreadyPurchased || orderRes.data?.alreadyRegistered) {
+        await completeSuccess();
+        return null;
       }
 
-      const loaded = await loadRazorpayScript();
-      if (!loaded || !window.Razorpay) {
-        setError("Could not load Razorpay. Check your internet connection.");
-        setLoading(false);
-        payingRef.current = false;
-        return;
+      if (!orderRes.success) {
+        throw new Error(orderRes.message || "Could not start payment");
       }
 
-      const options = {
-        key: keyId,
-        amount,
-        currency: currency || "INR",
-        name: "INDLearns",
-        description: orderItem?.title || item.title,
-        order_id: orderId,
-        handler: async (response) => {
-          try {
-            const verify = await cfg.verify(cfg.verifyPayload(response, item._id));
-            if (verify.success) {
-              await completeSuccess(verify.data);
-            } else {
-              setError(verify.message || "Payment verification failed");
-            }
-          } catch (err) {
-            setError(err.response?.data?.message || "Payment verification failed");
-          } finally {
-            setLoading(false);
-            payingRef.current = false;
-          }
-        },
-        prefill: { name: user?.name || "", email: user?.email || "" },
-        theme: { color: "#2D89EF" },
-        modal: {
-          ondismiss: () => {
-            setLoading(false);
-            payingRef.current = false;
-          },
-        },
-      };
+      if (orderRes.data?.free) {
+        await completeSuccess();
+        return null;
+      }
+
+      if (!orderRes.data?.orderId) {
+        throw new Error("Invalid payment response. Please try again.");
+      }
+
+      return orderRes.data.orderId;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Could not start payment");
+      setLoading(false);
+      payingRef.current = false;
+      throw err;
+    }
+  }, [item?._id, cfg, completeSuccess]);
+
+  const handlePayPalApprove = useCallback(
+    async (orderId) => {
+      if (!orderId || payingRef.current) return;
+
+      setError("");
+      setLoading(true);
+      payingRef.current = true;
 
       try {
-        const rzp = new window.Razorpay(options);
-        rzp.on("payment.failed", (resp) => {
-          setError(resp.error?.description || "Payment failed");
-          setLoading(false);
-          payingRef.current = false;
-        });
-        rzp.open();
+        const verify = await cfg.verify(cfg.verifyPayload(orderId, item._id));
+        if (verify.success) {
+          await completeSuccess(verify.data);
+        } else {
+          setError(verify.message || "Payment verification failed");
+        }
       } catch (err) {
-        setError(err.message || "Could not open Razorpay");
+        setError(err.response?.data?.message || err.message || "Payment verification failed");
+      } finally {
         setLoading(false);
         payingRef.current = false;
       }
     },
-    [item, user, cfg, completeSuccess]
+    [cfg, item?._id, completeSuccess]
   );
+
+  const handlePayPalError = useCallback((err) => {
+    setError(err?.message || "PayPal payment failed. Please try again.");
+    setLoading(false);
+    payingRef.current = false;
+  }, []);
+
+  const handlePayPalCancel = useCallback(() => {
+    setLoading(false);
+    payingRef.current = false;
+  }, []);
 
   const handlePurchase = useCallback(async () => {
     if (!item?._id || authLoading || payingRef.current) return;
@@ -244,48 +225,34 @@ export const useRazorpayPurchase = ({
 
       if (orderRes.data?.alreadyPurchased || orderRes.data?.alreadyRegistered) {
         await completeSuccess();
-        setLoading(false);
-        payingRef.current = false;
         return;
       }
 
       if (!orderRes.success) {
         setError(orderRes.message || "Could not start payment");
-        setLoading(false);
-        payingRef.current = false;
         return;
       }
 
-      if (orderRes.data.free) {
+      if (orderRes.data?.free) {
         await completeSuccess();
-        setLoading(false);
-        payingRef.current = false;
-        return;
       }
-
-      await openRazorpayCheckout(orderRes);
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Payment failed");
+    } finally {
       setLoading(false);
       payingRef.current = false;
     }
-  }, [
-    item,
-    isAuthenticated,
-    user,
-    cfg,
-    navigate,
-    onSuccess,
-    authLoading,
-    openRazorpayCheckout,
-    completeSuccess,
-  ]);
+  }, [item, isAuthenticated, user, cfg, navigate, authLoading, completeSuccess]);
 
   const disabled = authLoading || loading || configLoading || isClosed || hasAccess;
 
   return {
+    handlePayPalError,
+    handlePayPalCancel,
     handlePurchase,
     handleEnroll: handlePurchase,
+    createPayPalOrder,
+    handlePayPalApprove,
     loading,
     hasAccess,
     isClosed,
@@ -293,6 +260,8 @@ export const useRazorpayPurchase = ({
     gatewayReady,
     configLoading,
     testMode,
+    clientId,
+    currency,
     error,
     disabled,
     batchEnrolled,

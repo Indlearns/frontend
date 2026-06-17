@@ -5,7 +5,7 @@ import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import PurchaseButton from "../../components/payment/PurchaseButton";
 import PurchaseStatus from "../../components/payment/PurchaseStatus";
-import { useRazorpayPurchase } from "../../hooks/useRazorpayPurchase";
+import { usePayPalPurchase } from "../../hooks/usePayPalPurchase";
 import {
   getImageUrl,
   formatPrice,
@@ -15,7 +15,7 @@ import {
 import FormattedDescription from "../../components/common/FormattedDescription";
 
 const CourseDetailContent = ({ course, onReload }) => {
-  const purchase = useRazorpayPurchase({
+  const purchase = usePayPalPurchase({
     purchaseType: "course",
     item: course,
     onSuccess: onReload,
@@ -82,7 +82,7 @@ const CourseDetailContent = ({ course, onReload }) => {
           </p>
           {!purchase.isFree && (
             <p className="text-sm text-slate-500 mb-4">
-              Paid courses are completed via Razorpay at checkout.
+              Paid courses are completed via PayPal at checkout.
             </p>
           )}
           <PurchaseButton

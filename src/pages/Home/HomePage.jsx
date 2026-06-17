@@ -97,7 +97,7 @@ const HomePage = () => {
               </h1>
               <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
                 {APP_TAGLINE}. Explore open courses and upcoming workshops — no login required to
-                browse. Sign in to enroll via Razorpay, join live classes, and chat with tutors.
+                browse. Sign in to enroll via PayPal, join live classes, and chat with tutors.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link to="/courses">

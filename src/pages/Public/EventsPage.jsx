@@ -18,7 +18,7 @@ const EventsPage = () => {
     <div className="section-container py-12">
       <h1 className="font-display text-3xl lg:text-4xl font-bold">Hackathons</h1>
       <p className="mt-3 text-slate-600 dark:text-slate-400 max-w-2xl">
-        Competitive hackathons from IndLearn partners. Register and pay securely with Razorpay.
+        Competitive hackathons from IndLearn partners. Register and pay securely with PayPal.
       </p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {events.map((w) => (
