@@ -169,6 +169,9 @@ const CoursesPage = () => {
             {editingId && !imageFile && (
               <p className="text-xs text-slate-500 mt-1">Leave empty to keep the current image.</p>
             )}
+            <p className="text-xs text-slate-500 mt-1">
+              JPG, PNG, WebP or GIF · max 5 MB · recommended 1280×720 px. Images are stored permanently until you delete the course.
+            </p>
           </div>
 
           <input
