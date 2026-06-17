@@ -66,6 +66,8 @@ export const usePayPalPurchase = ({
   const [testMode, setTestMode] = useState(false);
   const [clientId, setClientId] = useState("");
   const [currency, setCurrency] = useState("USD");
+  const [enableCard, setEnableCard] = useState(true);
+  const [buyerCountry, setBuyerCountry] = useState("IN");
   const [error, setError] = useState("");
   const payingRef = useRef(false);
 
@@ -84,6 +86,8 @@ export const usePayPalPurchase = ({
         setTestMode(Boolean(r.success && r.data.testMode));
         setClientId(r.success ? r.data.clientId || "" : "");
         setCurrency(r.success ? r.data.currency || "USD" : "USD");
+        setEnableCard(r.success ? r.data.enableCard !== false : true);
+        setBuyerCountry(r.success ? r.data.buyerCountry || "IN" : "IN");
       })
       .catch(() => {
         if (!cancelled) setGatewayReady(false);
@@ -263,6 +267,8 @@ export const usePayPalPurchase = ({
     testMode,
     clientId,
     currency,
+    enableCard,
+    buyerCountry,
     listCurrency,
     error,
     disabled,

@@ -2,21 +2,31 @@ import { useEffect, useRef } from "react";
 
 const scriptCache = new Map();
 
-const buildPayPalSdkUrl = (clientId, currency) => {
+const buildPayPalSdkUrl = ({ clientId, currency, enableCard, buyerCountry }) => {
   const params = new URLSearchParams({
     "client-id": clientId,
     currency: currency || "USD",
     intent: "capture",
     components: "buttons",
-    "enable-funding": "card",
   });
+
+  if (enableCard) {
+    params.set("enable-funding", "card");
+  } else {
+    params.set("disable-funding", "card,credit,paylater");
+  }
+
+  if (buyerCountry) {
+    params.set("buyer-country", buyerCountry);
+  }
+
   return `https://www.paypal.com/sdk/js?${params.toString()}`;
 };
 
-export const loadPayPalScript = (clientId, currency = "USD") => {
+export const loadPayPalScript = ({ clientId, currency = "USD", enableCard = true, buyerCountry = "IN" }) => {
   if (!clientId) return Promise.resolve(false);
 
-  const cacheKey = `${clientId}:${currency || "USD"}`;
+  const cacheKey = `${clientId}:${currency || "USD"}:${enableCard}:${buyerCountry}`;
 
   if (window.paypal && window.__paypalSdkKey === cacheKey) {
     return Promise.resolve(true);
@@ -32,7 +42,7 @@ export const loadPayPalScript = (clientId, currency = "USD") => {
     window.__paypalSdkKey = undefined;
 
     const script = document.createElement("script");
-    script.src = buildPayPalSdkUrl(clientId, currency);
+    script.src = buildPayPalSdkUrl({ clientId, currency, enableCard, buyerCountry });
     script.async = true;
     script.setAttribute("data-paypal-sdk", cacheKey);
     script.onload = () => {
@@ -50,6 +60,8 @@ export const loadPayPalScript = (clientId, currency = "USD") => {
 const PayPalCheckout = ({
   clientId,
   currency,
+  enableCard = true,
+  buyerCountry = "IN",
   ready,
   createOrder,
   onApprove,
@@ -73,7 +85,7 @@ const PayPalCheckout = ({
 
     let cancelled = false;
 
-    loadPayPalScript(clientId, currency).then((loaded) => {
+    loadPayPalScript({ clientId, currency, enableCard, buyerCountry }).then((loaded) => {
       if (cancelled || !loaded || !window.paypal || !containerRef.current) {
         if (!cancelled) {
           onErrorRef.current?.(new Error("Could not load PayPal checkout."));
@@ -142,7 +154,7 @@ const PayPalCheckout = ({
         buttonsRef.current = null;
       }
     };
-  }, [clientId, currency, ready]);
+  }, [clientId, currency, enableCard, buyerCountry, ready]);
 
   return (
     <div

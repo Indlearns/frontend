@@ -6,6 +6,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import PayPalCheckout from "../../components/payment/PayPalCheckout";
 import { usePayPalPurchase } from "../../hooks/usePayPalPurchase";
 import { getPurchaseType } from "../../utils/purchaseFlow";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   getImageUrl,
   formatPrice,
@@ -18,6 +19,8 @@ import {
 const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   const navigate = useNavigate();
   const flow = getPurchaseType(purchaseType);
+  const { user } = useAuth();
+  const isStudent = user?.role === "student";
 
   const purchase = usePayPalPurchase({
     purchaseType,
@@ -150,6 +153,13 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
 
         {purchase.error && <p className="text-sm text-red-600 mt-3">{purchase.error}</p>}
 
+        {!isStudent && purchase.isAuthenticated && (
+          <p className="text-sm text-amber-700 mt-3 rounded-lg bg-amber-50 px-3 py-2">
+            You are logged in as <span className="font-medium">{user?.role}</span>. Please use a
+            student account to complete payment.
+          </p>
+        )}
+
         {purchase.isFree ? (
           <Button
             type="button"
@@ -167,7 +177,10 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
             <PayPalCheckout
               clientId={purchase.clientId}
               currency={purchase.currency}
+              enableCard={purchase.enableCard}
+              buyerCountry={purchase.buyerCountry}
               ready={
+                isStudent &&
                 purchase.gatewayReady &&
                 !purchase.configLoading &&
                 !purchase.hasAccess &&
