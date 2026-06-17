@@ -19,6 +19,36 @@ export const splitHomeEvents = (home) => {
   };
 };
 
+/** Build homepage workshop/hackathon lists and counts from home + list APIs. */
+export const buildHomeEventPayload = (homeData, workshopRes, hackathonRes) => {
+  const fallback = splitHomeEvents(homeData);
+
+  let allWorkshops = fallback.workshops;
+  let allHackathons = fallback.hackathons;
+
+  if (workshopRes?.success) {
+    allWorkshops = workshopRes.data.filter((item) => !isHackathonEvent(item));
+  }
+  if (hackathonRes?.success) {
+    allHackathons = hackathonRes.data.filter((item) => isHackathonEvent(item));
+  } else if (!allHackathons.length) {
+    allHackathons = fallback.hackathons;
+  }
+  if (!workshopRes?.success && !allWorkshops.length) {
+    allWorkshops = fallback.workshops;
+  }
+
+  return {
+    workshops: allWorkshops.slice(0, 4),
+    hackathons: allHackathons.slice(0, 4),
+    counts: {
+      courses: homeData?.counts?.courses ?? homeData?.courses?.length ?? 0,
+      workshops: allWorkshops.length,
+      hackathons: allHackathons.length,
+    },
+  };
+};
+
 export const getEventListPath = (item) =>
   isHackathonEvent(item) ? "/events" : "/workshops";
 

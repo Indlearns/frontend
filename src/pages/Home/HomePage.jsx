@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -16,7 +16,7 @@ import { FEATURES, STATS, APP_TAGLINE, ROLES } from "../../utils/constants";
 import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
 import { useAuth } from "../../contexts/AuthContext";
-import { splitHomeEvents } from "../../utils/eventPaths";
+import { buildHomeEventPayload } from "../../utils/eventPaths";
 
 const iconMap = {
   live: FiVideo,
@@ -41,21 +41,34 @@ const HomePage = () => {
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    publicService.getHome().then((r) => {
-      if (r.success) setHome(r.data);
-    });
+    let cancelled = false;
+
+    (async () => {
+      const [homeRes, workshopRes, hackathonRes] = await Promise.all([
+        publicService.getHome(),
+        publicService.getWorkshops("workshop"),
+        publicService.getWorkshops("hackathon"),
+      ]);
+
+      if (cancelled || !homeRes.success) return;
+
+      const events = buildHomeEventPayload(homeRes.data, workshopRes, hackathonRes);
+      setHome({ ...homeRes.data, ...events });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const { workshops: homeWorkshops, hackathons: homeHackathons } = useMemo(
-    () => splitHomeEvents(home),
-    [home]
-  );
+  const homeWorkshops = home?.workshops ?? [];
+  const homeHackathons = home?.hackathons ?? [];
 
   const counts = home?.counts;
   const dynamicStats = counts
     ? [
         { value: `${counts.courses}+`, label: "Open courses" },
-        { value: `${counts.workshops}+`, label: "Workshops" },
+        { value: `${counts.workshops ?? 0}+`, label: "Workshops" },
         { value: `${counts.hackathons ?? 0}+`, label: "Hackathons" },
         { value: "24/7", label: "Learning support" },
       ]
@@ -127,12 +140,12 @@ const HomePage = () => {
                   </div>
                   <div className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30">
                     <FiCalendar className="text-accent-600 mb-2" />
-                    <p className="font-bold text-2xl">{counts?.workshops ?? "—"}</p>
+                    <p className="font-bold text-2xl">{counts?.workshops ?? 0}</p>
                     <p className="text-xs text-slate-500">Workshops</p>
                   </div>
                   <div className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30">
                     <FiAward className="text-violet-600 mb-2" />
-                    <p className="font-bold text-2xl">{counts?.hackathons ?? "—"}</p>
+                    <p className="font-bold text-2xl">{counts?.hackathons ?? 0}</p>
                     <p className="text-xs text-slate-500">Hackathons</p>
                   </div>
                   <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30">
