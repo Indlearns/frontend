@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { publicService } from "../../services/publicService";
 import { WorkshopCard, EmptyState } from "../../components/public/ContentCards";
+import { isHackathonEvent } from "../../utils/eventPaths";
 
 const WorkshopsPage = () => {
   const [workshops, setWorkshops] = useState([]);
@@ -9,7 +10,7 @@ const WorkshopsPage = () => {
 
   useEffect(() => {
     publicService.getWorkshops("workshop").then((r) => {
-        if (r.success) setWorkshops(r.data);
+        if (r.success) setWorkshops(r.data.filter((w) => !isHackathonEvent(w)));
       })
       .finally(() => setLoading(false));
   }, []);

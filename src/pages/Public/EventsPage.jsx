@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { publicService } from "../../services/publicService";
 import { WorkshopCard, EmptyState } from "../../components/public/ContentCards";
+import { isHackathonEvent } from "../../utils/eventPaths";
 
 /** Events = hackathons and paid live events */
 const EventsPage = () => {
@@ -9,7 +10,7 @@ const EventsPage = () => {
 
   useEffect(() => {
     publicService.getWorkshops("hackathon").then((r) => {
-      if (r.success) setEvents(r.data);
+      if (r.success) setEvents(r.data.filter((w) => isHackathonEvent(w)));
     });
   }, []);
 

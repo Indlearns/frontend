@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -16,6 +16,7 @@ import { FEATURES, STATS, APP_TAGLINE, ROLES } from "../../utils/constants";
 import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
 import { useAuth } from "../../contexts/AuthContext";
+import { splitHomeEvents } from "../../utils/eventPaths";
 
 const iconMap = {
   live: FiVideo,
@@ -44,6 +45,11 @@ const HomePage = () => {
       if (r.success) setHome(r.data);
     });
   }, []);
+
+  const { workshops: homeWorkshops, hackathons: homeHackathons } = useMemo(
+    () => splitHomeEvents(home),
+    [home]
+  );
 
   const counts = home?.counts;
   const dynamicStats = counts
@@ -209,10 +215,10 @@ const HomePage = () => {
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {home?.workshops?.map((w) => (
+            {homeWorkshops.map((w) => (
               <WorkshopCard key={w._id} workshop={w} compact />
             ))}
-            {!home?.workshops?.length && (
+            {!homeWorkshops.length && (
               <EmptyState
                 title="No workshops scheduled"
                 hint="New workshops will be listed here soon."
@@ -237,10 +243,10 @@ const HomePage = () => {
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {home?.hackathons?.map((w) => (
+            {homeHackathons.map((w) => (
               <WorkshopCard key={w._id} workshop={w} compact />
             ))}
-            {!home?.hackathons?.length && (
+            {!homeHackathons.length && (
               <EmptyState
                 title="No hackathons scheduled"
                 hint="New hackathons will be listed here soon."
