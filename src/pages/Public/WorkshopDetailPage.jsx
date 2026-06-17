@@ -137,7 +137,7 @@ const WorkshopDetailPage = () => {
       <div className="section-container py-16 text-center">
         <p className="text-slate-600">{error || "Not found."}</p>
         <Link to="/workshops" className="inline-block mt-4">
-          <Button variant="outline">Back</Button>
+          <Button variant="outline">Back to workshops</Button>
         </Link>
       </div>
     );
@@ -151,7 +151,7 @@ const WorkshopDetailPage = () => {
         to={isHackathon ? "/events" : "/workshops"}
         className="text-sm text-brand-600 hover:underline"
       >
-        ← {isHackathon ? "Events" : "Workshops"}
+        ← {isHackathon ? "Hackathons" : "Workshops"}
       </Link>
       <WorkshopDetailContent workshop={workshop} onReload={load} />
     </div>

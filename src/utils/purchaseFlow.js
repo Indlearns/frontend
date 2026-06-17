@@ -24,7 +24,7 @@ export const PURCHASE_TYPES = {
   hackathon: {
     apiType: "workshop",
     listPath: "/events",
-    detailPath: (id) => `/workshops/${id}`,
+    detailPath: (id) => `/events/${id}`,
     checkoutPath: (id) => `/checkout/hackathon/${id}`,
     actionLabel: "Register now",
     payLabel: "Pay with Razorpay",

@@ -8,6 +8,7 @@ import {
   formatRegistrationCloseDate,
   isRegistrationClosed,
 } from "../../utils/media";
+import { getEventDetailPath, isHackathonEvent } from "../../utils/eventPaths";
 
 export const CourseCard = ({ course, compact }) => {
   const closed = isEnrollmentClosed(course);
@@ -78,12 +79,24 @@ export const CourseCard = ({ course, compact }) => {
 
 export const WorkshopCard = ({ workshop, compact }) => (
   <Link
-    to={`/workshops/${workshop._id}`}
+    to={getEventDetailPath(workshop)}
     className="glass-card p-5 hover:shadow-lg transition-shadow block group h-full"
   >
     <div className="flex items-start justify-between gap-2">
-      <div className="w-10 h-10 rounded-xl bg-accent-500/15 flex items-center justify-center shrink-0">
-        <FiCalendar className="text-accent-600 dark:text-accent-400" />
+      <div
+        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+          isHackathonEvent(workshop)
+            ? "bg-violet-500/15"
+            : "bg-accent-500/15"
+        }`}
+      >
+        <FiCalendar
+          className={
+            isHackathonEvent(workshop)
+              ? "text-violet-600 dark:text-violet-400"
+              : "text-accent-600 dark:text-accent-400"
+          }
+        />
       </div>
       <span className="text-sm font-bold text-brand-600">
         {formatPrice(workshop.price, workshop.currency)}
@@ -92,8 +105,10 @@ export const WorkshopCard = ({ workshop, compact }) => (
     <h3 className="font-bold text-lg mt-3 text-slate-900 dark:text-white group-hover:text-brand-600">
       {workshop.title}
     </h3>
-    {workshop.eventType && (
-      <span className="text-xs capitalize text-accent-600">{workshop.eventType}</span>
+    {isHackathonEvent(workshop) ? (
+      <span className="text-xs capitalize text-violet-600 font-medium">Hackathon</span>
+    ) : (
+      <span className="text-xs capitalize text-accent-600">Workshop</span>
     )}
     {!compact && workshop.description && (
       <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">

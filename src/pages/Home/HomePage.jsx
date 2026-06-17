@@ -49,8 +49,8 @@ const HomePage = () => {
   const dynamicStats = counts
     ? [
         { value: `${counts.courses}+`, label: "Open courses" },
-        { value: `${counts.workshops}+`, label: "Upcoming workshops" },
-        { value: "Live", label: "Online classes" },
+        { value: `${counts.workshops}+`, label: "Workshops" },
+        { value: `${counts.hackathons ?? 0}+`, label: "Hackathons" },
         { value: "24/7", label: "Learning support" },
       ]
     : STATS;
@@ -124,6 +124,11 @@ const HomePage = () => {
                     <p className="font-bold text-2xl">{counts?.workshops ?? "—"}</p>
                     <p className="text-xs text-slate-500">Workshops</p>
                   </div>
+                  <div className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30">
+                    <FiAward className="text-violet-600 mb-2" />
+                    <p className="font-bold text-2xl">{counts?.hackathons ?? "—"}</p>
+                    <p className="text-xs text-slate-500">Hackathons</p>
+                  </div>
                   <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30">
                     <FiVideo className="text-brand-600 mb-2" />
                     <p className="font-bold text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -189,16 +194,18 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Workshops */}
+      {/* Workshops — workshops only */}
       <section className="py-16 bg-slate-50/80 dark:bg-slate-900/30">
         <div className="section-container">
           <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
             <div>
               <h2 className="section-title text-slate-900 dark:text-white">Upcoming workshops</h2>
-              <p className="text-slate-600 dark:text-slate-400 mt-2">Upcoming workshops from IndLearn</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-2">
+                Hands-on learning sessions — separate from hackathons
+              </p>
             </div>
             <Link to="/workshops" className="text-brand-600 font-medium text-sm flex items-center gap-1">
-              View all <FiArrowRight />
+              View all workshops <FiArrowRight />
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -209,6 +216,34 @@ const HomePage = () => {
               <EmptyState
                 title="No workshops scheduled"
                 hint="New workshops will be listed here soon."
+              />
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Hackathons */}
+      <section className="py-16">
+        <div className="section-container">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+            <div>
+              <h2 className="section-title text-slate-900 dark:text-white">Upcoming hackathons</h2>
+              <p className="text-slate-600 dark:text-slate-400 mt-2">
+                Competitive coding events and challenges
+              </p>
+            </div>
+            <Link to="/events" className="text-brand-600 font-medium text-sm flex items-center gap-1">
+              View all hackathons <FiArrowRight />
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {home?.hackathons?.map((w) => (
+              <WorkshopCard key={w._id} workshop={w} compact />
+            ))}
+            {!home?.hackathons?.length && (
+              <EmptyState
+                title="No hackathons scheduled"
+                hint="New hackathons will be listed here soon."
               />
             )}
           </div>

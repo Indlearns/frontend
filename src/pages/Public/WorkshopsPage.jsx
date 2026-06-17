@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { publicService } from "../../services/publicService";
 import { WorkshopCard, EmptyState } from "../../components/public/ContentCards";
 
@@ -7,12 +8,8 @@ const WorkshopsPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    publicService
-      .getWorkshops()
-      .then((r) => {
-        if (r.success) {
-          setWorkshops(r.data.filter((w) => w.eventType !== "hackathon"));
-        }
+    publicService.getWorkshops("workshop").then((r) => {
+        if (r.success) setWorkshops(r.data);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -36,6 +33,12 @@ const WorkshopsPage = () => {
           />
         )}
       </div>
+      <p className="text-center mt-10 text-sm text-slate-500">
+        Looking for hackathons?{" "}
+        <Link to="/events" className="text-brand-600 hover:underline">
+          View hackathons →
+        </Link>
+      </p>
     </div>
   );
 };

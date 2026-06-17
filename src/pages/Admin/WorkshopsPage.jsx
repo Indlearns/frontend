@@ -24,6 +24,7 @@ const emptyForm = {
 
 const WorkshopsPage = () => {
   const [workshops, setWorkshops] = useState([]);
+  const [listTab, setListTab] = useState("workshop");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -92,11 +93,22 @@ const WorkshopsPage = () => {
     load();
   };
 
+  const filteredList = workshops.filter((w) =>
+    listTab === "hackathon" ? w.eventType === "hackathon" : w.eventType !== "hackathon"
+  );
+
+  const switchTab = (tab) => {
+    setListTab(tab);
+    if (!editingId) {
+      setForm((f) => ({ ...f, eventType: tab }));
+    }
+  };
+
   return (
     <div>
       <PageHeader
         title="Workshops & Hackathons"
-        subtitle="Create, edit, and delete free or paid events. Price 0 = free registration."
+        subtitle="Workshops and hackathons are listed separately on the public site. Choose type when creating."
       />
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
@@ -198,9 +210,27 @@ const WorkshopsPage = () => {
           </Button>
         </form>
         <div className="glass-card p-6">
-          <h2 className="font-bold text-lg mb-4">All events ({workshops.length})</h2>
+          <div className="flex gap-2 mb-4">
+            {["workshop", "hackathon"].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => switchTab(tab)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium capitalize ${
+                  listTab === tab
+                    ? "bg-brand-600 text-white"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600"
+                }`}
+              >
+                {tab === "workshop" ? "Workshops" : "Hackathons"}
+              </button>
+            ))}
+          </div>
+          <h2 className="font-bold text-lg mb-4">
+            {listTab === "hackathon" ? "Hackathons" : "Workshops"} ({filteredList.length})
+          </h2>
           <ul className="space-y-3 max-h-[600px] overflow-y-auto">
-            {workshops.map((w) => (
+            {filteredList.map((w) => (
               <li
                 key={w._id}
                 className={`p-4 rounded-xl border ${
@@ -248,8 +278,10 @@ const WorkshopsPage = () => {
                 </div>
               </li>
             ))}
-            {!workshops.length && (
-              <p className="text-sm text-slate-500">No workshops or hackathons yet.</p>
+            {!filteredList.length && (
+              <p className="text-sm text-slate-500">
+                No {listTab === "hackathon" ? "hackathons" : "workshops"} yet.
+              </p>
             )}
           </ul>
         </div>

@@ -162,6 +162,7 @@ const AppRoutes = () => (
       <Route path="workshops" element={<WorkshopsPage />} />
       <Route path="workshops/:id" element={<WorkshopDetailPage />} />
       <Route path="events" element={<EventsPage />} />
+      <Route path="events/:id" element={<WorkshopDetailPage />} />
       <Route path="mentorship" element={<MentorshipPage />} />
       <Route path="privacy" element={<PrivacyPolicyPage />} />
       <Route path="terms" element={<TermsPage />} />

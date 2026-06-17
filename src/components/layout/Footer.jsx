@@ -16,7 +16,7 @@ const Footer = () => {
     Platform: [
       { label: "Courses", path: "/courses" },
       { label: "Workshops", path: "/workshops" },
-      { label: "Events", path: "/events" },
+      { label: "Hackathons", path: "/events" },
       { label: "Mentorship", path: "/mentorship" },
     ],
     Company: [
