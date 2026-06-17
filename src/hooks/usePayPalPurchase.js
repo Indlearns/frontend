@@ -65,12 +65,13 @@ export const usePayPalPurchase = ({
   const [configLoading, setConfigLoading] = useState(true);
   const [testMode, setTestMode] = useState(false);
   const [clientId, setClientId] = useState("");
+  const [currency, setCurrency] = useState("USD");
   const [error, setError] = useState("");
   const payingRef = useRef(false);
 
   const isFree = isFreePrice(item);
   const isClosed = item ? cfg.closed(item) : false;
-  const currency = item?.currency || "INR";
+  const listCurrency = item?.currency || "INR";
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +83,7 @@ export const usePayPalPurchase = ({
         setGatewayReady(Boolean(r.success && r.data.enabled));
         setTestMode(Boolean(r.success && r.data.testMode));
         setClientId(r.success ? r.data.clientId || "" : "");
+        setCurrency(r.success ? r.data.currency || "USD" : "USD");
       })
       .catch(() => {
         if (!cancelled) setGatewayReady(false);
@@ -262,6 +264,7 @@ export const usePayPalPurchase = ({
     testMode,
     clientId,
     currency,
+    listCurrency,
     error,
     disabled,
     batchEnrolled,

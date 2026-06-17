@@ -129,9 +129,15 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
             {purchase.configLoading && (
               <p className="text-sm text-slate-500 mt-3">Connecting to PayPal...</p>
             )}
-            {!purchase.configLoading && purchase.gatewayReady && purchase.testMode && (
+            {!purchase.configLoading && purchase.gatewayReady && purchase.currency !== purchase.listCurrency && (
               <p className="text-sm text-amber-700 mt-3 rounded-lg bg-amber-50 px-3 py-2">
-                Sandbox mode — use your PayPal sandbox buyer account to test payments.
+                PayPal will charge in {purchase.currency}. Listed price{" "}
+                {formatPrice(item.price, item.currency)} is converted automatically at checkout.
+              </p>
+            )}
+            {!purchase.configLoading && purchase.gatewayReady && purchase.testMode && (
+              <p className="text-sm text-slate-600 mt-3">
+                Sandbox mode — use a PayPal sandbox buyer account to test.
               </p>
             )}
             {!purchase.configLoading && !purchase.gatewayReady && (
