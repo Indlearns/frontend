@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 const scriptCache = new Map();
 
-const buildPayPalSdkUrl = ({ clientId, currency, enableCard, buyerCountry }) => {
+const buildPayPalSdkUrl = ({ clientId, currency, enableCard, buyerCountry, sandbox }) => {
   const params = new URLSearchParams({
     "client-id": clientId,
     currency: currency || "USD",
@@ -16,17 +16,24 @@ const buildPayPalSdkUrl = ({ clientId, currency, enableCard, buyerCountry }) => 
     params.set("disable-funding", "card,credit,paylater");
   }
 
-  if (buyerCountry) {
+  // buyer-country is sandbox-only; including it on live SDK loads returns HTTP 400.
+  if (sandbox && buyerCountry) {
     params.set("buyer-country", buyerCountry);
   }
 
   return `https://www.paypal.com/sdk/js?${params.toString()}`;
 };
 
-export const loadPayPalScript = ({ clientId, currency = "USD", enableCard = true, buyerCountry = "IN" }) => {
+export const loadPayPalScript = ({
+  clientId,
+  currency = "USD",
+  enableCard = true,
+  buyerCountry = "IN",
+  sandbox = false,
+}) => {
   if (!clientId) return Promise.resolve(false);
 
-  const cacheKey = `${clientId}:${currency || "USD"}:${enableCard}:${buyerCountry}`;
+  const cacheKey = `${clientId}:${currency || "USD"}:${enableCard}:${sandbox ? buyerCountry : "live"}`;
 
   if (window.paypal && window.__paypalSdkKey === cacheKey) {
     return Promise.resolve(true);
@@ -42,7 +49,7 @@ export const loadPayPalScript = ({ clientId, currency = "USD", enableCard = true
     window.__paypalSdkKey = undefined;
 
     const script = document.createElement("script");
-    script.src = buildPayPalSdkUrl({ clientId, currency, enableCard, buyerCountry });
+    script.src = buildPayPalSdkUrl({ clientId, currency, enableCard, buyerCountry, sandbox });
     script.async = true;
     script.setAttribute("data-paypal-sdk", cacheKey);
     script.onload = () => {
@@ -62,6 +69,7 @@ const PayPalCheckout = ({
   currency,
   enableCard = true,
   buyerCountry = "IN",
+  sandbox = false,
   ready,
   createOrder,
   onApprove,
@@ -85,7 +93,7 @@ const PayPalCheckout = ({
 
     let cancelled = false;
 
-    loadPayPalScript({ clientId, currency, enableCard, buyerCountry }).then((loaded) => {
+    loadPayPalScript({ clientId, currency, enableCard, buyerCountry, sandbox }).then((loaded) => {
       if (cancelled || !loaded || !window.paypal || !containerRef.current) {
         if (!cancelled) {
           onErrorRef.current?.(new Error("Could not load PayPal checkout."));
@@ -154,7 +162,7 @@ const PayPalCheckout = ({
         buttonsRef.current = null;
       }
     };
-  }, [clientId, currency, enableCard, buyerCountry, ready]);
+  }, [clientId, currency, enableCard, buyerCountry, sandbox, ready]);
 
   return (
     <div

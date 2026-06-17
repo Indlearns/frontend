@@ -179,6 +179,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
               currency={purchase.currency}
               enableCard={purchase.enableCard}
               buyerCountry={purchase.buyerCountry}
+              sandbox={purchase.testMode}
               ready={
                 isStudent &&
                 purchase.gatewayReady &&
