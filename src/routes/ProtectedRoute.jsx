@@ -5,6 +5,7 @@ import {
   ROLES,
   SUPERADMIN_LOGIN_PATH,
   ADMIN_LOGIN_PATH,
+  PARTNER_LOGIN_PATH,
 } from "../utils/constants";
 
 const LOGIN_PATHS = {
@@ -12,6 +13,7 @@ const LOGIN_PATHS = {
   [ROLES.ADMIN]: ADMIN_LOGIN_PATH,
   [ROLES.TUTOR]: "/login",
   [ROLES.STUDENT]: "/login",
+  [ROLES.PARTNER]: PARTNER_LOGIN_PATH,
 };
 
 const STAFF_ROLES = [ROLES.SUPERADMIN, ROLES.ADMIN];

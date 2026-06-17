@@ -40,6 +40,7 @@ export const adminService = {
   deleteWorkshop: (id) => api.delete(`/admin/workshops/${id}`).then((r) => r.data),
 
   createCompany: (data) => api.post("/admin/companies", data).then((r) => r.data),
+  createPartner: (data) => api.post("/admin/companies", data).then((r) => r.data),
   getCompanies: () => api.get("/admin/companies").then((r) => r.data),
   updateCompany: (id, data) => api.put(`/admin/companies/${id}`, data).then((r) => r.data),
   deleteCompany: (id) => api.delete(`/admin/companies/${id}`).then((r) => r.data),

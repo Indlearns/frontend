@@ -10,6 +10,9 @@ export const studentService = {
   updateProfile: (data) => api.put("/student/profile", data).then((r) => r.data),
   getResumeData: () => api.get("/student/resume").then((r) => r.data),
   getCareerJobs: () => api.get("/student/career/jobs").then((r) => r.data),
+  applyToJob: (jobId, coverNote) =>
+    api.post(`/student/career/jobs/${jobId}/apply`, { coverNote }).then((r) => r.data),
+  getMyApplications: () => api.get("/student/career/applications").then((r) => r.data),
 
   getAssignments: () => api.get("/student/assignments").then((r) => r.data),
   submitAssignment: (id, data) =>

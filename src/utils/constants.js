@@ -6,6 +6,7 @@ export const ROLES = {
   ADMIN: "admin",
   TUTOR: "tutor",
   STUDENT: "student",
+  PARTNER: "partner",
 };
 
 export const SUPER_ADMIN_EMAIL = "official@indlearns.com";
@@ -36,6 +37,7 @@ export const SOCIAL_LINKS = [
 /** Private URLs — bookmark only, not on public menu */
 export const SUPERADMIN_LOGIN_PATH = "/superadmin/login";
 export const ADMIN_LOGIN_PATH = "/admins/login";
+export const PARTNER_LOGIN_PATH = "/partners/login";
 
 export const ROLE_LABELS = {
   superadmin: "Super Admin",

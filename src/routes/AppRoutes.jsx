@@ -50,7 +50,11 @@ import TermsPage from "../pages/Legal/TermsPage";
 import RefundPolicyPage from "../pages/Legal/RefundPolicyPage";
 import AboutPage from "../pages/Public/AboutPage";
 import ContactPage from "../pages/Public/ContactPage";
-import NotFoundPage from "../pages/NotFoundPage";
+import PartnerLoginPage from "../pages/Auth/PartnerLoginPage";
+import PartnerLayout from "../components/partner/layout/PartnerLayout";
+import PartnerOverviewPage from "../pages/Partner/PartnerOverviewPage";
+import PartnerJobsPage from "../pages/Partner/PartnerJobsPage";
+import PartnerApplicationsPage from "../pages/Partner/PartnerApplicationsPage";
 import ProtectedRoute from "./ProtectedRoute";
 import StudentEnrolledRoute from "./StudentEnrolledRoute";
 import { ROLES } from "../utils/constants";
@@ -66,6 +70,7 @@ const AppRoutes = () => (
   <Routes>
     <Route path="superadmin/login" element={<SuperAdminLoginPage />} />
     <Route path="admins/login" element={<StaffAdminLoginPage />} />
+    <Route path="partners/login" element={<PartnerLoginPage />} />
 
     {/* Legacy URL → unified admin portal */}
     <Route path="superadmin" element={<Navigate to="/admin" replace />} />
@@ -128,6 +133,19 @@ const AppRoutes = () => (
       <Route path="classes" element={<StudentClassesPage />} />
       <Route path="assignments" element={<StudentAssignmentsPage />} />
       <Route path="meetings" element={<StudentMeetingsPage />} />
+    </Route>
+
+    <Route
+      path="/partner"
+      element={
+        <ProtectedRoute allowedRoles={[ROLES.PARTNER]}>
+          <PartnerLayout />
+        </ProtectedRoute>
+      }
+    >
+      <Route index element={<PartnerOverviewPage />} />
+      <Route path="jobs" element={<PartnerJobsPage />} />
+      <Route path="applications" element={<PartnerApplicationsPage />} />
     </Route>
 
     <Route element={<Layout />}>

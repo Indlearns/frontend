@@ -5,18 +5,40 @@ import Button from "../../components/common/Button";
 
 const StudentCareerPage = () => {
   const [data, setData] = useState(null);
+  const [applyingId, setApplyingId] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const load = () => {
+    studentService.getCareerJobs().then((r) => r.success && setData(r.data));
+  };
 
   useEffect(() => {
-    studentService.getCareerJobs().then((r) => r.success && setData(r.data));
+    load();
   }, []);
+
+  const handleApply = async (jobId) => {
+    setApplyingId(jobId);
+    setMessage("");
+    try {
+      const r = await studentService.applyToJob(jobId);
+      if (r.success) {
+        setMessage("Application submitted successfully.");
+        load();
+      }
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Could not apply.");
+    } finally {
+      setApplyingId(null);
+    }
+  };
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Career</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-6">
-        Jobs matched to your enrolled courses and skills. Complete more of your program to
-        strengthen your profile.
+        Jobs from hiring partners. Apply directly — partners can see your course progress.
       </p>
+      {message && <p className="text-sm text-brand-600 mb-4">{message}</p>}
       {data?.courseCategories?.length > 0 && (
         <p className="text-sm text-brand-600 mb-6">
           Matching: {data.courseCategories.join(", ")}
@@ -48,16 +70,30 @@ const StudentCareerPage = () => {
                 ))}
               </div>
             )}
-            {job.applyLink && (
-              <a
-                href={job.applyLink}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block mt-4 text-sm font-medium text-brand-600"
-              >
-                Apply externally →
-              </a>
-            )}
+            <div className="mt-4 flex flex-wrap gap-3 items-center">
+              {job.application ? (
+                <span className="text-sm text-green-700 capitalize">
+                  Applied · {job.application.status}
+                </span>
+              ) : job.canApplyInApp ? (
+                <Button
+                  type="button"
+                  disabled={applyingId === job._id}
+                  onClick={() => handleApply(job._id)}
+                >
+                  {applyingId === job._id ? "Applying..." : "Apply now"}
+                </Button>
+              ) : job.applyLink ? (
+                <a
+                  href={job.applyLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-medium text-brand-600"
+                >
+                  Apply externally →
+                </a>
+              ) : null}
+            </div>
           </div>
         ))}
         {!data?.jobs?.length && <p className="text-slate-500">No jobs listed yet.</p>}
