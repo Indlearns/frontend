@@ -172,11 +172,10 @@ export const usePayPalPurchase = ({
 
   const handlePayPalApprove = useCallback(
     async (orderId) => {
-      if (!orderId || payingRef.current) return;
+      if (!orderId) return;
 
       setError("");
       setLoading(true);
-      payingRef.current = true;
 
       try {
         const verify = await cfg.verify(cfg.verifyPayload(orderId, item._id));

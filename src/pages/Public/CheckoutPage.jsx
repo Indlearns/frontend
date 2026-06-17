@@ -110,7 +110,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         )}
       </div>
 
-      <div className="lg:col-span-2 glass-card p-6 h-fit">
+      <div className="lg:col-span-2 glass-card p-6 h-fit overflow-visible">
         <h2 className="font-display text-xl font-bold">Payment</h2>
         <div className="flex justify-between items-baseline mt-4 pb-4 border-b border-brand-100">
           <span className="text-slate-600">Amount</span>
@@ -160,15 +160,25 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
             {purchase.loading || purchase.configLoading ? "Please wait..." : flow.freeLabel}
           </Button>
         ) : (
-          <PayPalCheckout
-            clientId={purchase.clientId}
-            currency={purchase.currency}
-            disabled={payDisabled || purchase.loading}
-            createOrder={purchase.createPayPalOrder}
-            onApprove={purchase.handlePayPalApprove}
-            onError={purchase.handlePayPalError}
-            onCancel={purchase.handlePayPalCancel}
-          />
+          <>
+            {purchase.loading && (
+              <p className="text-sm text-slate-500 mt-3">Processing payment...</p>
+            )}
+            <PayPalCheckout
+              clientId={purchase.clientId}
+              currency={purchase.currency}
+              ready={
+                purchase.gatewayReady &&
+                !purchase.configLoading &&
+                !purchase.hasAccess &&
+                !purchase.isClosed
+              }
+              createOrder={purchase.createPayPalOrder}
+              onApprove={purchase.handlePayPalApprove}
+              onError={purchase.handlePayPalError}
+              onCancel={purchase.handlePayPalCancel}
+            />
+          </>
         )}
 
         <Link

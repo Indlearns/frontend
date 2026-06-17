@@ -1,44 +1,56 @@
 import { useEffect, useRef } from "react";
 
-export const loadPayPalScript = (clientId, currency = "INR") =>
-  new Promise((resolve) => {
-    if (!clientId) {
-      resolve(false);
-      return;
-    }
+const scriptCache = new Map();
 
-    if (window.paypal) {
-      resolve(true);
-      return;
-    }
+const buildPayPalSdkUrl = (clientId, currency) => {
+  const params = new URLSearchParams({
+    "client-id": clientId,
+    currency: currency || "USD",
+    intent: "capture",
+    components: "buttons",
+    "enable-funding": "card",
+  });
+  return `https://www.paypal.com/sdk/js?${params.toString()}`;
+};
 
-    const src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}`;
-    const existing = document.querySelector(`script[src*="paypal.com/sdk/js"]`);
-    if (existing) {
-      if (existing.getAttribute("data-loaded") === "true") {
-        resolve(Boolean(window.paypal));
-        return;
-      }
-      existing.addEventListener("load", () => resolve(Boolean(window.paypal)));
-      existing.addEventListener("error", () => resolve(false));
-      return;
-    }
+export const loadPayPalScript = (clientId, currency = "USD") => {
+  if (!clientId) return Promise.resolve(false);
+
+  const cacheKey = `${clientId}:${currency || "USD"}`;
+
+  if (window.paypal && window.__paypalSdkKey === cacheKey) {
+    return Promise.resolve(true);
+  }
+
+  if (scriptCache.has(cacheKey)) {
+    return scriptCache.get(cacheKey);
+  }
+
+  const promise = new Promise((resolve) => {
+    document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((node) => node.remove());
+    delete window.paypal;
+    window.__paypalSdkKey = undefined;
 
     const script = document.createElement("script");
-    script.src = src;
+    script.src = buildPayPalSdkUrl(clientId, currency);
     script.async = true;
+    script.setAttribute("data-paypal-sdk", cacheKey);
     script.onload = () => {
-      script.setAttribute("data-loaded", "true");
+      window.__paypalSdkKey = cacheKey;
       resolve(Boolean(window.paypal));
     };
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
 
+  scriptCache.set(cacheKey, promise);
+  return promise;
+};
+
 const PayPalCheckout = ({
   clientId,
   currency,
-  disabled,
+  ready,
   createOrder,
   onApprove,
   onError,
@@ -46,14 +58,28 @@ const PayPalCheckout = ({
 }) => {
   const containerRef = useRef(null);
   const buttonsRef = useRef(null);
+  const createOrderRef = useRef(createOrder);
+  const onApproveRef = useRef(onApprove);
+  const onErrorRef = useRef(onError);
+  const onCancelRef = useRef(onCancel);
+
+  createOrderRef.current = createOrder;
+  onApproveRef.current = onApprove;
+  onErrorRef.current = onError;
+  onCancelRef.current = onCancel;
 
   useEffect(() => {
-    if (!clientId || disabled || !containerRef.current) return undefined;
+    if (!clientId || !ready || !containerRef.current) return undefined;
 
     let cancelled = false;
 
     loadPayPalScript(clientId, currency).then((loaded) => {
-      if (cancelled || !loaded || !window.paypal || !containerRef.current) return;
+      if (cancelled || !loaded || !window.paypal || !containerRef.current) {
+        if (!cancelled) {
+          onErrorRef.current?.(new Error("Could not load PayPal checkout."));
+        }
+        return;
+      }
 
       if (buttonsRef.current) {
         try {
@@ -66,28 +92,42 @@ const PayPalCheckout = ({
 
       containerRef.current.innerHTML = "";
 
-      buttonsRef.current = window.paypal.Buttons({
-        style: { layout: "vertical", color: "blue", shape: "rect", label: "paypal" },
+      const buttons = window.paypal.Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          tagline: false,
+        },
         createOrder: async () => {
-          const orderId = await createOrder();
+          const orderId = await createOrderRef.current();
           if (!orderId) {
             throw new Error("Could not create PayPal order.");
           }
           return orderId;
         },
         onApprove: async (data) => {
-          await onApprove(data.orderID);
+          await onApproveRef.current(data.orderID);
         },
         onError: (err) => {
-          onError?.(err);
+          onErrorRef.current?.(err);
         },
         onCancel: () => {
-          onCancel?.();
+          onCancelRef.current?.();
         },
       });
 
-      buttonsRef.current.render(containerRef.current).catch((err) => {
-        onError?.(err);
+      if (!buttons.isEligible()) {
+        onErrorRef.current?.(
+          new Error("PayPal checkout is not available for this browser or account.")
+        );
+        return;
+      }
+
+      buttonsRef.current = buttons;
+      buttons.render(containerRef.current).catch((err) => {
+        onErrorRef.current?.(err);
       });
     });
 
@@ -101,13 +141,16 @@ const PayPalCheckout = ({
         }
         buttonsRef.current = null;
       }
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
-      }
     };
-  }, [clientId, currency, disabled, createOrder, onApprove, onError, onCancel]);
+  }, [clientId, currency, ready]);
 
-  return <div ref={containerRef} className="mt-4 min-h-[45px]" />;
+  return (
+    <div
+      ref={containerRef}
+      className="paypal-checkout-host mt-4 w-full min-h-[220px]"
+      aria-live="polite"
+    />
+  );
 };
 
 export default PayPalCheckout;
