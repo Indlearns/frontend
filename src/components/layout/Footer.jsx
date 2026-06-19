@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiLinkedin, FiMail, FiPhone, FiInstagram } from "react-icons/fi";
+import { FiLinkedin, FiMail, FiPhone, FiInstagram, FiMapPin } from "react-icons/fi";
 import Logo from "../common/Logo";
 import { APP_NAME, CONTACT, SOCIAL_LINKS } from "../../utils/constants";
 
@@ -56,6 +56,10 @@ const Footer = () => {
                 <FiPhone size={16} className="shrink-0" />
                 {CONTACT.phoneDisplay}
               </a>
+              <p className="flex items-start gap-2 text-brand-200/90">
+                <FiMapPin size={16} className="shrink-0 mt-0.5" />
+                <span>{CONTACT.address}</span>
+              </p>
             </div>
 
             <div className="flex gap-3 mt-6">

@@ -17,6 +17,7 @@ export const CONTACT = {
   phone: "9606991651",
   phoneTel: "+919606991651",
   phoneDisplay: "+91 96069 91651",
+  address: "1-1077, Kilasagiri Colony, Srikalahasti, Andhra Pradesh - 517644",
   linkedin: "https://www.linkedin.com/company/indlearns",
   instagram: "https://www.instagram.com/ind.learns",
 };

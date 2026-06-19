@@ -1,4 +1,4 @@
-import { FiMail, FiHeadphones, FiClock, FiPhone, FiLinkedin, FiInstagram } from "react-icons/fi";
+import { FiMail, FiHeadphones, FiClock, FiPhone, FiLinkedin, FiInstagram, FiMapPin } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { CONTACT } from "../../utils/constants";
 
@@ -41,6 +41,10 @@ const ContactPage = () => (
           <FiPhone size={20} />
           {CONTACT.phoneDisplay}
         </a>
+        <p className="flex items-start justify-center gap-2 text-sm text-slate-600 dark:text-slate-400 pt-2">
+          <FiMapPin size={18} className="shrink-0 mt-0.5 text-brand-600" />
+          <span>{CONTACT.address}</span>
+        </p>
       </div>
 
       <div className="mt-8 pt-6 border-t border-brand-100 dark:border-slate-700">

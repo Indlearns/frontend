@@ -95,6 +95,7 @@ const LegalDocumentPage = ({ document }) => {
             {CONTACT.phoneDisplay}
           </a>
         </p>
+        <p className="text-sm text-slate-700 dark:text-slate-300 mt-2">{CONTACT.address}</p>
       </div>
 
       <div className="mt-8 pt-8 border-t border-brand-100 dark:border-slate-800 flex flex-wrap gap-4 text-sm">
