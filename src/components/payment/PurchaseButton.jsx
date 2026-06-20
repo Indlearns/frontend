@@ -4,7 +4,7 @@ import { getPurchaseType } from "../../utils/purchaseFlow";
 
 /**
  * Unified CTA for courses, workshops, and hackathons.
- * Free → enroll/register immediately. Paid → go to checkout → PayPal.
+ * Free → enroll/register immediately. Paid → go to checkout → Zoho Payments.
  */
 const PurchaseButton = ({
   purchaseType,

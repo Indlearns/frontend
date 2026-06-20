@@ -50,6 +50,8 @@ import TermsPage from "../pages/Legal/TermsPage";
 import RefundPolicyPage from "../pages/Legal/RefundPolicyPage";
 import AboutPage from "../pages/Public/AboutPage";
 import ContactPage from "../pages/Public/ContactPage";
+import PaymentReturnPage from "../pages/Public/PaymentReturnPage";
+import ZohoOAuthCallbackPage from "../pages/Public/ZohoOAuthCallbackPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import PartnerLoginPage from "../pages/Auth/PartnerLoginPage";
 import PartnerLayout from "../components/partner/layout/PartnerLayout";
@@ -158,6 +160,8 @@ const AppRoutes = () => (
       <Route path="courses" element={<CoursesPage />} />
       <Route path="courses/:id" element={<CourseDetailPage />} />
       <Route path="checkout/:type/:id" element={<CheckoutPage />} />
+      <Route path="payment/return" element={<PaymentReturnPage />} />
+      <Route path="zoho/oauth/callback" element={<ZohoOAuthCallbackPage />} />
       <Route path="courses/:id/checkout" element={<LegacyCourseCheckoutRedirect />} />
       <Route path="workshops" element={<WorkshopsPage />} />
       <Route path="workshops/:id" element={<WorkshopDetailPage />} />

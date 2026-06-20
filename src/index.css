@@ -60,15 +60,4 @@
   .input-field {
     @apply w-full px-4 py-2.5 rounded-xl border border-brand-200 dark:border-brand-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-brand-400 focus:border-brand-400;
   }
-
-  .paypal-checkout-host {
-    overflow: visible;
-    min-height: 220px;
-  }
-
-  .paypal-checkout-host > div,
-  .paypal-checkout-host iframe {
-    min-height: 220px;
-    width: 100% !important;
-  }
 }

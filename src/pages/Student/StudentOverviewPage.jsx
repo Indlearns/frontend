@@ -28,7 +28,7 @@ const StudentOverviewPage = () => {
       <div>
         <h1 className="text-2xl font-bold mb-2">Welcome, student</h1>
         <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-xl">
-          Browse open courses and enroll with PayPal. After enrollment you will land here on your
+          Browse open courses and enroll with Zoho Payments. After enrollment you will land here on your
           student dashboard.
         </p>
         <Link to="/courses">

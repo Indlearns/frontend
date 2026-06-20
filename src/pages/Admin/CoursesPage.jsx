@@ -212,7 +212,7 @@ const CoursesPage = () => {
               className="input-field"
             />
             <p className="text-xs text-slate-500 mt-1">
-              Use 0 for a free course. Paid courses use PayPal at checkout.
+              Use 0 for a free course. Paid courses use Zoho Payments at checkout.
             </p>
           </div>
           <div>

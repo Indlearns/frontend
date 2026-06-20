@@ -3,6 +3,11 @@ import api from "./api";
 export const paymentService = {
   getConfig: () => api.get("/payments/config").then((r) => r.data),
 
+  getZohoSetup: () => api.get("/payments/zoho/setup").then((r) => r.data),
+
+  exchangeZohoCode: (code) =>
+    api.post("/payments/zoho/exchange-code", { code }).then((r) => r.data),
+
   createCourseOrder: (courseId) =>
     api.post(`/payments/course/${courseId}/create-order`).then((r) => r.data),
 

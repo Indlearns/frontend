@@ -3,8 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { publicService } from "../../services/publicService";
 import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-import PayPalCheckout from "../../components/payment/PayPalCheckout";
-import { usePayPalPurchase } from "../../hooks/usePayPalPurchase";
+import { usePurchase } from "../../hooks/usePurchase";
 import { getPurchaseType } from "../../utils/purchaseFlow";
 import { useAuth } from "../../contexts/AuthContext";
 import {
@@ -22,7 +21,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   const { user } = useAuth();
   const isStudent = user?.role === "student";
 
-  const purchase = usePayPalPurchase({
+  const purchase = usePurchase({
     purchaseType,
     item,
     onSuccess: () => {
@@ -113,7 +112,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         )}
       </div>
 
-      <div className="lg:col-span-2 glass-card p-6 h-fit overflow-visible">
+      <div className="lg:col-span-2 glass-card p-6 h-fit">
         <h2 className="font-display text-xl font-bold">Payment</h2>
         <div className="flex justify-between items-baseline mt-4 pb-4 border-b border-brand-100">
           <span className="text-slate-600">Amount</span>
@@ -127,25 +126,17 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         ) : (
           <>
             <p className="text-sm text-slate-500 mt-4">
-              Secure payment via PayPal. Use the button below to complete your purchase.
+              Secure payment via Zoho Payments (UPI, card, net banking). You will be redirected to
+              complete payment.
             </p>
             {purchase.configLoading && (
-              <p className="text-sm text-slate-500 mt-3">Connecting to PayPal...</p>
-            )}
-            {!purchase.configLoading && purchase.gatewayReady && purchase.currency !== purchase.listCurrency && (
-              <p className="text-sm text-amber-700 mt-3 rounded-lg bg-amber-50 px-3 py-2">
-                PayPal will charge in {purchase.currency}. Listed price{" "}
-                {formatPrice(item.price, item.currency)} is converted automatically at checkout.
-              </p>
-            )}
-            {!purchase.configLoading && purchase.gatewayReady && purchase.testMode && (
-              <p className="text-sm text-slate-600 mt-3">
-                Sandbox mode — use a PayPal sandbox buyer account to test.
-              </p>
+              <p className="text-sm text-slate-500 mt-3">Connecting to payment gateway...</p>
             )}
             {!purchase.configLoading && !purchase.gatewayReady && (
               <p className="text-sm text-amber-600 mt-3">
-                PayPal is not configured. Add credentials to backend .env and restart the server.
+                {purchase.needsRefreshToken
+                  ? "Zoho OAuth setup is incomplete. Super admin must complete one-time authorization and add the refresh token to the backend."
+                  : "Zoho Payments is not configured. Add credentials to backend .env and restart the server."}
               </p>
             )}
           </>
@@ -160,40 +151,18 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
           </p>
         )}
 
-        {purchase.isFree ? (
-          <Button
-            type="button"
-            className="w-full mt-6 py-3"
-            disabled={payDisabled}
-            onClick={purchase.handlePurchase}
-          >
-            {purchase.loading || purchase.configLoading ? "Please wait..." : flow.freeLabel}
-          </Button>
-        ) : (
-          <>
-            {purchase.loading && (
-              <p className="text-sm text-slate-500 mt-3">Processing payment...</p>
-            )}
-            <PayPalCheckout
-              clientId={purchase.clientId}
-              currency={purchase.currency}
-              enableCard={purchase.enableCard}
-              buyerCountry={purchase.buyerCountry}
-              sandbox={purchase.testMode}
-              ready={
-                isStudent &&
-                purchase.gatewayReady &&
-                !purchase.configLoading &&
-                !purchase.hasAccess &&
-                !purchase.isClosed
-              }
-              createOrder={purchase.createPayPalOrder}
-              onApprove={purchase.handlePayPalApprove}
-              onError={purchase.handlePayPalError}
-              onCancel={purchase.handlePayPalCancel}
-            />
-          </>
-        )}
+        <Button
+          type="button"
+          className="w-full mt-6 py-3"
+          disabled={payDisabled || (!purchase.isFree && !isStudent)}
+          onClick={purchase.handlePurchase}
+        >
+          {purchase.loading || purchase.configLoading
+            ? "Please wait..."
+            : purchase.isFree
+              ? flow.freeLabel
+              : flow.payLabel}
+        </Button>
 
         <Link
           to={flow.detailPath(item._id)}
@@ -225,9 +194,7 @@ const CheckoutPage = () => {
     setError("");
 
     const fetcher =
-      type === "course"
-        ? publicService.getCourse(id)
-        : publicService.getWorkshop(id);
+      type === "course" ? publicService.getCourse(id) : publicService.getWorkshop(id);
 
     fetcher
       .then((r) => {
@@ -278,7 +245,7 @@ const CheckoutPage = () => {
         ← Back to details
       </Link>
       <h1 className="font-display text-3xl font-bold mt-4">{TYPE_LABELS[type]}</h1>
-      <p className="text-slate-600 mt-2">Review your order and pay with PayPal to continue.</p>
+      <p className="text-slate-600 mt-2">Review your order and pay with Zoho Payments to continue.</p>
       <CheckoutContent purchaseType={type} item={item} onComplete={load} />
     </div>
   );
