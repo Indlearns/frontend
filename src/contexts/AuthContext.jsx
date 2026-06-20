@@ -65,6 +65,15 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (patch) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      localStorage.setItem("user", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const isAuthenticated = !!user;
   const isSuperAdmin = user?.role === "superadmin";
   const isAdmin = user?.role === "admin";
@@ -81,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         loginWithAuthData,
         register,
         logout,
+        updateUser,
         isAuthenticated,
         isSuperAdmin,
         isAdmin,

@@ -18,6 +18,7 @@ const OverviewPage = () => {
     { label: "Tutors", value: stats?.tutors, to: "/admin/tutors" },
     { label: "Students", value: stats?.students, to: "/admin/students" },
     { label: "Workshops", value: stats?.workshops, to: "/admin/workshops" },
+    { label: "Hackathons", value: stats?.hackathons, to: "/admin/workshops?tab=hackathon" },
     { label: "Partners", value: stats?.companies, to: "/admin/companies" },
     { label: "Upcoming Classes", value: stats?.upcomingClasses, to: "/admin/schedule" },
   ];

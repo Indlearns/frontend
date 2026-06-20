@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { publicService } from "../../services/publicService";
+import { studentService } from "../../services/studentService";
 import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { usePurchase } from "../../hooks/usePurchase";
@@ -14,12 +15,16 @@ import {
   isEnrollmentClosed,
   isRegistrationClosed,
 } from "../../utils/media";
+import { hasValidPaymentPhone, normalizeIndianPhone } from "../../utils/zohoPaymentFormat";
 
 const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   const navigate = useNavigate();
   const flow = getPurchaseType(purchaseType);
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const isStudent = user?.role === "student";
+  const [phoneInput, setPhoneInput] = useState(user?.phone || "");
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const purchase = usePurchase({
     purchaseType,
@@ -73,6 +78,32 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   const payDisabled =
     purchase.disabled ||
     (!purchase.isFree && !purchase.configLoading && !purchase.gatewayReady);
+
+  const missingPhone =
+    !purchase.isFree && isStudent && purchase.isAuthenticated && !hasValidPaymentPhone(user?.phone);
+  const missingEmail = !purchase.isFree && isStudent && purchase.isAuthenticated && !user?.email?.trim();
+  const phoneReady = !missingPhone || Boolean(normalizeIndianPhone(phoneInput));
+
+  const handlePay = async () => {
+    setCheckoutError("");
+    if (missingPhone && normalizeIndianPhone(phoneInput)) {
+      setSavingPhone(true);
+      try {
+        const r = await studentService.updateProfile({ phone: phoneInput.trim() });
+        if (!r.success) {
+          setCheckoutError(r.message || "Could not save phone number.");
+          return;
+        }
+        updateUser({ phone: r.data?.user?.phone || phoneInput.trim() });
+      } catch (err) {
+        setCheckoutError(err.response?.data?.message || "Could not save phone number.");
+        return;
+      } finally {
+        setSavingPhone(false);
+      }
+    }
+    purchase.handlePurchase();
+  };
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-5">
@@ -142,7 +173,30 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
           </>
         )}
 
-        {purchase.error && <p className="text-sm text-red-600 mt-3">{purchase.error}</p>}
+        {(purchase.error || checkoutError) && (
+          <p className="text-sm text-red-600 mt-3">{purchase.error || checkoutError}</p>
+        )}
+
+        {missingPhone && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-1">Mobile number (required for Zoho)</label>
+            <input
+              type="tel"
+              inputMode="numeric"
+              placeholder="10-digit mobile number"
+              value={phoneInput}
+              onChange={(e) => setPhoneInput(e.target.value)}
+              className="input-field"
+            />
+            <p className="text-xs text-slate-500 mt-1">Zoho Payments requires a valid Indian mobile number.</p>
+          </div>
+        )}
+
+        {missingEmail && (
+          <p className="text-sm text-amber-700 mt-3 rounded-lg bg-amber-50 px-3 py-2">
+            Your account is missing an email address. Contact support before paying.
+          </p>
+        )}
 
         {!isStudent && purchase.isAuthenticated && (
           <p className="text-sm text-amber-700 mt-3 rounded-lg bg-amber-50 px-3 py-2">
@@ -154,10 +208,16 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         <Button
           type="button"
           className="w-full mt-6 py-3"
-          disabled={payDisabled || (!purchase.isFree && !isStudent)}
-          onClick={purchase.handlePurchase}
+          disabled={
+            payDisabled ||
+            (!purchase.isFree && !isStudent) ||
+            missingEmail ||
+            !phoneReady ||
+            savingPhone
+          }
+          onClick={handlePay}
         >
-          {purchase.loading || purchase.configLoading
+          {purchase.loading || purchase.configLoading || savingPhone
             ? "Please wait..."
             : purchase.isFree
               ? flow.freeLabel

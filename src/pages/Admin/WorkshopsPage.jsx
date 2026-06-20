@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { adminService } from "../../services/adminService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
+import { isHackathonEvent } from "../../utils/eventPaths";
+import { isPubliclyVisibleWorkshop } from "../../utils/workshopVisibility";
 import {
   formatPrice,
   formatRegistrationCloseDate,
@@ -23,8 +26,10 @@ const emptyForm = {
 };
 
 const WorkshopsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") === "hackathon" ? "hackathon" : "workshop";
   const [workshops, setWorkshops] = useState([]);
-  const [listTab, setListTab] = useState("workshop");
+  const [listTab, setListTab] = useState(initialTab);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +60,7 @@ const WorkshopsPage = () => {
       startTime: workshop.startTime || "10:00",
       endTime: workshop.endTime || "12:00",
       meetLink: workshop.meetLink || "",
-      status: workshop.status || "upcoming",
+      status: workshop.status === "live" ? "ongoing" : workshop.status || "upcoming",
       price: workshop.price != null ? String(workshop.price) : "",
       registrationCloseDate: toDateInputValue(workshop.registrationCloseDate),
     });
@@ -94,11 +99,15 @@ const WorkshopsPage = () => {
   };
 
   const filteredList = workshops.filter((w) =>
-    listTab === "hackathon" ? w.eventType === "hackathon" : w.eventType !== "hackathon"
+    listTab === "hackathon" ? isHackathonEvent(w) : !isHackathonEvent(w)
   );
+
+  const workshopCount = workshops.filter((w) => !isHackathonEvent(w)).length;
+  const hackathonCount = workshops.filter((w) => isHackathonEvent(w)).length;
 
   const switchTab = (tab) => {
     setListTab(tab);
+    setSearchParams(tab === "hackathon" ? { tab: "hackathon" } : {});
     if (!editingId) {
       setForm((f) => ({ ...f, eventType: tab }));
     }
@@ -201,7 +210,7 @@ const WorkshopsPage = () => {
             className="input-field"
           >
             <option value="upcoming">Upcoming</option>
-            <option value="live">Live</option>
+            <option value="ongoing">Ongoing / Live</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
@@ -222,7 +231,9 @@ const WorkshopsPage = () => {
                     : "bg-slate-100 dark:bg-slate-800 text-slate-600"
                 }`}
               >
-                {tab === "workshop" ? "Workshops" : "Hackathons"}
+                {tab === "workshop"
+                  ? `Workshops (${workshopCount})`
+                  : `Hackathons (${hackathonCount})`}
               </button>
             ))}
           </div>
@@ -252,8 +263,13 @@ const WorkshopsPage = () => {
                     {formatPrice(w.price, w.currency)}
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 capitalize">
-                    {w.status}
+                    {w.status === "ongoing" ? "ongoing" : w.status}
                   </span>
+                  {!isPubliclyVisibleWorkshop(w) && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                      Hidden on public site
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-slate-500 mt-1">
                   {new Date(w.date).toLocaleDateString()} · {w.startTime}–{w.endTime}
