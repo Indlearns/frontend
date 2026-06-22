@@ -8,6 +8,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 const nav = [
   { to: "/student", label: "Overview", end: true },
   { to: "/student/courses", label: "My courses" },
+  { to: "/student/workshops", label: "My workshops" },
+  { to: "/student/hackathons", label: "My hackathons" },
   { to: "/student/classes", label: "Live classes" },
   { to: "/student/assignments", label: "Assignments" },
   { to: "/student/progress", label: "My progress" },

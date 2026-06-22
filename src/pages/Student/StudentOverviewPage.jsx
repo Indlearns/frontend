@@ -9,6 +9,8 @@ const StudentOverviewPage = () => {
   const { enrolled } = useStudentEnrollment();
   const [batchCourses, setBatchCourses] = useState([]);
   const [purchasedCourses, setPurchasedCourses] = useState([]);
+  const [myWorkshops, setMyWorkshops] = useState([]);
+  const [myHackathons, setMyHackathons] = useState([]);
 
   useEffect(() => {
     if (enrolled) {
@@ -16,6 +18,12 @@ const StudentOverviewPage = () => {
         if (r.success) {
           setBatchCourses(r.data || []);
           setPurchasedCourses(r.purchasedCourses || []);
+        }
+      });
+      studentService.getMyEvents().then((r) => {
+        if (r.success) {
+          setMyWorkshops(r.data.workshops || []);
+          setMyHackathons(r.data.hackathons || []);
         }
       });
     }
@@ -42,10 +50,16 @@ const StudentOverviewPage = () => {
     <div className="max-w-4xl">
       <h1 className="text-xl sm:text-2xl font-bold mb-2">Welcome back</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-6 sm:mb-8 text-sm sm:text-base">
-        You have access to {totalCount} course{totalCount !== 1 ? "s" : ""}.
+        {totalCount > 0
+          ? `You have access to ${totalCount} course${totalCount !== 1 ? "s" : ""}.`
+          : myWorkshops.length || myHackathons.length
+            ? "View your registered workshops and hackathons below."
+            : "Your student dashboard."}
         {batchCourses.length > 0
           ? " Open a batch dashboard for live classes, assignments, and chat."
-          : " Live batch classes appear here once your admin assigns you to a batch."}
+          : totalCount > 0
+            ? " Live batch classes appear here once your admin assigns you to a batch."
+            : ""}
       </p>
 
       {purchasedCourses.length > 0 && (
@@ -91,9 +105,40 @@ const StudentOverviewPage = () => {
         </div>
       )}
 
+      {(myWorkshops.length > 0 || myHackathons.length > 0) && (
+        <div className="mb-8 grid sm:grid-cols-2 gap-4">
+          {myWorkshops.length > 0 && (
+            <Link to="/student/workshops" className="glass-card p-5 hover:border-brand-500 block">
+              <p className="font-bold text-lg">My workshops</p>
+              <p className="text-sm text-slate-500 mt-1">
+                {myWorkshops.length} registered workshop{myWorkshops.length !== 1 ? "s" : ""}
+              </p>
+            </Link>
+          )}
+          {myHackathons.length > 0 && (
+            <Link to="/student/hackathons" className="glass-card p-5 hover:border-brand-500 block">
+              <p className="font-bold text-lg">My hackathons</p>
+              <p className="text-sm text-slate-500 mt-1">
+                {myHackathons.length} registered hackathon{myHackathons.length !== 1 ? "s" : ""}
+              </p>
+            </Link>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row flex-wrap gap-3">
         <Link to="/student/courses" className="w-full sm:w-auto">
           <Button className="w-full sm:w-auto">My courses</Button>
+        </Link>
+        <Link to="/student/workshops" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto">
+            My workshops
+          </Button>
+        </Link>
+        <Link to="/student/hackathons" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto">
+            My hackathons
+          </Button>
         </Link>
         {batchCourses.length > 0 && (
           <>

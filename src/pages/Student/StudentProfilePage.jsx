@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { studentService } from "../../services/studentService";
 import Button from "../../components/common/Button";
 
@@ -186,6 +187,25 @@ const StudentProfilePage = () => {
 
         <Button type="submit">{saved ? "Saved!" : "Save profile"}</Button>
       </form>
+
+      <div className="mt-10 pt-8 border-t border-brand-100">
+        <h2 className="font-bold text-lg mb-3">My registrations</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Workshops and hackathons you have enrolled in.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link to="/student/workshops">
+            <Button type="button" variant="outline">
+              My workshops
+            </Button>
+          </Link>
+          <Link to="/student/hackathons">
+            <Button type="button" variant="outline">
+              My hackathons
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

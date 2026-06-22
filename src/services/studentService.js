@@ -3,6 +3,7 @@ import api from "./api";
 export const studentService = {
   getEnrollmentStatus: () => api.get("/student/enrollment-status").then((r) => r.data),
   getMyCourses: () => api.get("/student/my-courses").then((r) => r.data),
+  getMyEvents: () => api.get("/student/my-events").then((r) => r.data),
   getCourseDashboard: (batchId) =>
     api.get(`/student/my-courses/${batchId}`).then((r) => r.data),
   getProgress: () => api.get("/student/progress").then((r) => r.data),

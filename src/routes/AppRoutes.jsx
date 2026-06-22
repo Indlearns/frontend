@@ -22,6 +22,7 @@ import StudentClassesPage from "../pages/Student/StudentClassesPage";
 import StudentAssignmentsPage from "../pages/Student/StudentAssignmentsPage";
 import StudentMeetingsPage from "../pages/Student/StudentMeetingsPage";
 import StudentMyCoursesPage from "../pages/Student/StudentMyCoursesPage";
+import StudentMyEventsPage from "../pages/Student/StudentMyEventsPage";
 import StudentCourseDashboardPage from "../pages/Student/StudentCourseDashboardPage";
 import StudentProgressPage from "../pages/Student/StudentProgressPage";
 import StudentCareerPage from "../pages/Student/StudentCareerPage";
@@ -127,6 +128,8 @@ const AppRoutes = () => (
     >
       <Route index element={<StudentOverviewPage />} />
       <Route path="courses" element={<StudentMyCoursesPage />} />
+      <Route path="workshops" element={<StudentMyEventsPage kind="workshop" />} />
+      <Route path="hackathons" element={<StudentMyEventsPage kind="hackathon" />} />
       <Route path="courses/:batchId" element={<StudentCourseDashboardPage />} />
       <Route path="progress" element={<StudentProgressPage />} />
       <Route path="career" element={<StudentCareerPage />} />
