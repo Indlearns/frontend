@@ -18,8 +18,18 @@ export const paymentService = {
       .post(`/payments/course/${courseId}/validate-referral`, { referralCode })
       .then((r) => r.data),
 
-  createWorkshopOrder: (workshopId) =>
-    api.post(`/payments/workshop/${workshopId}/create-order`).then((r) => r.data),
+  createWorkshopOrder: (workshopId, { referralCode } = {}) =>
+    api
+      .post(`/payments/workshop/${workshopId}/create-order`, { referralCode })
+      .then((r) => r.data),
+
+  validateReferral: (purchaseType, itemId, referralCode) => {
+    const path =
+      purchaseType === "course"
+        ? `/payments/course/${itemId}/validate-referral`
+        : `/payments/workshop/${itemId}/validate-referral`;
+    return api.post(path, { referralCode }).then((r) => r.data);
+  },
 
   verifyCoursePayment: (data) => api.post("/payments/verify", data).then((r) => r.data),
 

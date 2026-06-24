@@ -25,7 +25,7 @@ const HOOK_CONFIG = {
     accessMsg: "You are registered for this event.",
     loginHint: "Login as a student to register.",
     roleError: "Please log in as a student to register.",
-    createOrder: (id) => paymentService.createWorkshopOrder(id),
+    createOrder: (id, opts) => paymentService.createWorkshopOrder(id, opts),
     checkAccess: (id) => paymentService.checkWorkshopAccess(id),
     verify: (data) => paymentService.verifyWorkshopPayment(data),
   },
@@ -130,8 +130,7 @@ export const usePurchase = ({ purchaseType, item, onSuccess, referralCode }) => 
     payingRef.current = true;
 
     try {
-      const orderOpts =
-        apiType === "course" && referralCode ? { referralCode } : undefined;
+      const orderOpts = referralCode ? { referralCode } : undefined;
       const orderRes = await cfg.createOrder(item._id, orderOpts);
 
       if (orderRes.data?.alreadyPurchased || orderRes.data?.alreadyRegistered) {

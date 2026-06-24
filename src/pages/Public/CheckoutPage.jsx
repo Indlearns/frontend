@@ -45,8 +45,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   });
 
   const displayAmount = appliedReferral?.finalAmount ?? item.price;
-  const showReferralPricing =
-    purchaseType === "course" && !purchase.isFree && appliedReferral?.discountAmount > 0;
+  const showReferralPricing = !purchase.isFree && appliedReferral?.discountAmount > 0;
 
   const handleApplyReferral = async () => {
     setReferralError("");
@@ -57,7 +56,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
     }
     setValidatingReferral(true);
     try {
-      const r = await paymentService.validateCourseReferral(item._id, code);
+      const r = await paymentService.validateReferral(purchaseType, item._id, code);
       if (r.success) {
         setAppliedReferral(r.data);
       } else {
@@ -191,7 +190,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         <h2 className="font-display text-xl font-bold">Payment</h2>
         <div className="flex justify-between items-baseline mt-4 pb-4 border-b border-brand-100">
           <span className="text-slate-600">
-            {showReferralPricing ? "Course price" : "Amount"}
+            {showReferralPricing ? "Original price" : "Amount"}
           </span>
           <span
             className={`text-2xl font-bold text-brand-600 ${showReferralPricing ? "line-through text-slate-400 text-lg" : ""}`}
@@ -219,7 +218,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
           </>
         )}
 
-        {purchaseType === "course" && !purchase.isFree && (
+        {!purchase.isFree && (
           <div className="mt-4 pt-4 border-t border-brand-100">
             <label className="block text-sm font-medium mb-1">Referral code (optional)</label>
             <div className="flex gap-2">
