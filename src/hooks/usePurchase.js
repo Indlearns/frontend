@@ -14,7 +14,7 @@ const HOOK_CONFIG = {
     accessMsg: "You are enrolled in this course.",
     loginHint: "Login as a student to enroll.",
     roleError: "Please log in as a student to enroll.",
-    createOrder: (id) => paymentService.createCourseOrder(id),
+    createOrder: (id, opts) => paymentService.createCourseOrder(id, opts),
     checkAccess: (id) => paymentService.checkCourseAccess(id),
     verify: (data) => paymentService.verifyCoursePayment(data),
   },
@@ -34,7 +34,7 @@ const HOOK_CONFIG = {
 /**
  * Unified Zoho Payments purchase hook for courses, workshops, and hackathons.
  */
-export const usePurchase = ({ purchaseType, item, onSuccess }) => {
+export const usePurchase = ({ purchaseType, item, onSuccess, referralCode }) => {
   const flow = getPurchaseType(purchaseType);
   const apiType = flow?.apiType;
   const cfg = apiType ? HOOK_CONFIG[apiType] : null;
@@ -130,7 +130,9 @@ export const usePurchase = ({ purchaseType, item, onSuccess }) => {
     payingRef.current = true;
 
     try {
-      const orderRes = await cfg.createOrder(item._id);
+      const orderOpts =
+        apiType === "course" && referralCode ? { referralCode } : undefined;
+      const orderRes = await cfg.createOrder(item._id, orderOpts);
 
       if (orderRes.data?.alreadyPurchased || orderRes.data?.alreadyRegistered) {
         await completeSuccess();
@@ -158,7 +160,7 @@ export const usePurchase = ({ purchaseType, item, onSuccess }) => {
       payingRef.current = false;
       setLoading(false);
     }
-  }, [item, isAuthenticated, user, cfg, navigate, authLoading, completeSuccess]);
+  }, [item, isAuthenticated, user, cfg, navigate, authLoading, completeSuccess, referralCode]);
 
   const disabled = authLoading || loading || configLoading || isClosed || hasAccess;
 

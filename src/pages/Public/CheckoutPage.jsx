@@ -4,8 +4,8 @@ import { publicService } from "../../services/publicService";
 import { studentService } from "../../services/studentService";
 import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { paymentService } from "../../services/paymentService";
 import { usePurchase } from "../../hooks/usePurchase";
-import { getPurchaseType } from "../../utils/purchaseFlow";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   getImageUrl,
@@ -15,6 +15,8 @@ import {
   isEnrollmentClosed,
   isRegistrationClosed,
 } from "../../utils/media";
+import { getPurchaseType } from "../../utils/purchaseFlow";
+
 import { hasValidPaymentPhone, normalizeIndianPhone } from "../../utils/zohoPaymentFormat";
 
 const CheckoutContent = ({ purchaseType, item, onComplete }) => {
@@ -25,10 +27,15 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
   const [phoneInput, setPhoneInput] = useState(user?.phone || "");
   const [savingPhone, setSavingPhone] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [referralInput, setReferralInput] = useState("");
+  const [appliedReferral, setAppliedReferral] = useState(null);
+  const [referralError, setReferralError] = useState("");
+  const [validatingReferral, setValidatingReferral] = useState(false);
 
   const purchase = usePurchase({
     purchaseType,
     item,
+    referralCode: appliedReferral?.referralCode,
     onSuccess: () => {
       onComplete();
       if (purchaseType !== "course") {
@@ -36,6 +43,40 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
       }
     },
   });
+
+  const displayAmount = appliedReferral?.finalAmount ?? item.price;
+  const showReferralPricing =
+    purchaseType === "course" && !purchase.isFree && appliedReferral?.discountAmount > 0;
+
+  const handleApplyReferral = async () => {
+    setReferralError("");
+    const code = referralInput.trim();
+    if (!code) {
+      setReferralError("Enter a referral code.");
+      return;
+    }
+    setValidatingReferral(true);
+    try {
+      const r = await paymentService.validateCourseReferral(item._id, code);
+      if (r.success) {
+        setAppliedReferral(r.data);
+      } else {
+        setAppliedReferral(null);
+        setReferralError(r.message || "Invalid referral code.");
+      }
+    } catch (err) {
+      setAppliedReferral(null);
+      setReferralError(err.response?.data?.message || "Invalid referral code.");
+    } finally {
+      setValidatingReferral(false);
+    }
+  };
+
+  const handleClearReferral = () => {
+    setReferralInput("");
+    setAppliedReferral(null);
+    setReferralError("");
+  };
 
   useEffect(() => {
     if (!purchase.authLoading && !purchase.isAuthenticated) {
@@ -75,13 +116,16 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         ? `Registration closes ${formatRegistrationCloseDate(item.registrationCloseDate)}`
         : null;
 
+  const fullyDiscounted = appliedReferral && appliedReferral.finalAmount <= 0;
+  const needsPayment = !purchase.isFree && !fullyDiscounted;
+
   const payDisabled =
     purchase.disabled ||
-    (!purchase.isFree && !purchase.configLoading && !purchase.gatewayReady);
+    (needsPayment && !purchase.configLoading && !purchase.gatewayReady);
 
   const missingPhone =
-    !purchase.isFree && isStudent && purchase.isAuthenticated && !hasValidPaymentPhone(user?.phone);
-  const missingEmail = !purchase.isFree && isStudent && purchase.isAuthenticated && !user?.email?.trim();
+    needsPayment && isStudent && purchase.isAuthenticated && !hasValidPaymentPhone(user?.phone);
+  const missingEmail = needsPayment && isStudent && purchase.isAuthenticated && !user?.email?.trim();
   const phoneReady = !missingPhone || Boolean(normalizeIndianPhone(phoneInput));
 
   const handlePay = async () => {
@@ -146,14 +190,76 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
       <div className="lg:col-span-2 glass-card p-6 h-fit">
         <h2 className="font-display text-xl font-bold">Payment</h2>
         <div className="flex justify-between items-baseline mt-4 pb-4 border-b border-brand-100">
-          <span className="text-slate-600">Amount</span>
-          <span className="text-2xl font-bold text-brand-600">
+          <span className="text-slate-600">
+            {showReferralPricing ? "Course price" : "Amount"}
+          </span>
+          <span
+            className={`text-2xl font-bold text-brand-600 ${showReferralPricing ? "line-through text-slate-400 text-lg" : ""}`}
+          >
             {formatPrice(item.price, item.currency)}
           </span>
         </div>
 
-        {purchase.isFree ? (
-          <p className="text-sm text-slate-500 mt-4">This is free. Confirm below to continue.</p>
+        {showReferralPricing && (
+          <>
+            <div className="flex justify-between items-baseline mt-3 text-sm">
+              <span className="text-green-700">
+                Referral ({appliedReferral.referralCode})
+              </span>
+              <span className="font-medium text-green-700">
+                −{formatPrice(appliedReferral.discountAmount, item.currency)}
+              </span>
+            </div>
+            <div className="flex justify-between items-baseline mt-3 pt-3 border-t border-brand-100">
+              <span className="text-slate-600 font-medium">You pay</span>
+              <span className="text-2xl font-bold text-brand-600">
+                {formatPrice(displayAmount, item.currency)}
+              </span>
+            </div>
+          </>
+        )}
+
+        {purchaseType === "course" && !purchase.isFree && (
+          <div className="mt-4 pt-4 border-t border-brand-100">
+            <label className="block text-sm font-medium mb-1">Referral code (optional)</label>
+            <div className="flex gap-2">
+              <input
+                className="input-field flex-1 uppercase"
+                placeholder="Enter code"
+                value={referralInput}
+                onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
+                disabled={Boolean(appliedReferral)}
+              />
+              {appliedReferral ? (
+                <Button type="button" variant="outline" onClick={handleClearReferral}>
+                  Remove
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleApplyReferral}
+                  disabled={validatingReferral}
+                >
+                  {validatingReferral ? "..." : "Apply"}
+                </Button>
+              )}
+            </div>
+            {referralError && <p className="text-sm text-red-600 mt-2">{referralError}</p>}
+            {appliedReferral?.finalAmount <= 0 && (
+              <p className="text-sm text-green-700 mt-2">
+                Full discount applied — no payment required.
+              </p>
+            )}
+          </div>
+        )}
+
+        {purchase.isFree || (appliedReferral && appliedReferral.finalAmount <= 0) ? (
+          <p className="text-sm text-slate-500 mt-4">
+            {appliedReferral?.finalAmount <= 0
+              ? "Your referral code covers the full price. Confirm below to enroll."
+              : "This is free. Confirm below to continue."}
+          </p>
         ) : (
           <>
             <p className="text-sm text-slate-500 mt-4">
@@ -210,7 +316,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
           className="w-full mt-6 py-3"
           disabled={
             payDisabled ||
-            (!purchase.isFree && !isStudent) ||
+            (!isStudent && purchase.isAuthenticated) ||
             missingEmail ||
             !phoneReady ||
             savingPhone
@@ -219,7 +325,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         >
           {purchase.loading || purchase.configLoading || savingPhone
             ? "Please wait..."
-            : purchase.isFree
+            : purchase.isFree || (appliedReferral && appliedReferral.finalAmount <= 0)
               ? flow.freeLabel
               : flow.payLabel}
         </Button>

@@ -8,8 +8,15 @@ export const paymentService = {
   exchangeZohoCode: (code) =>
     api.post("/payments/zoho/exchange-code", { code }).then((r) => r.data),
 
-  createCourseOrder: (courseId) =>
-    api.post(`/payments/course/${courseId}/create-order`).then((r) => r.data),
+  createCourseOrder: (courseId, { referralCode } = {}) =>
+    api
+      .post(`/payments/course/${courseId}/create-order`, { referralCode })
+      .then((r) => r.data),
+
+  validateCourseReferral: (courseId, referralCode) =>
+    api
+      .post(`/payments/course/${courseId}/validate-referral`, { referralCode })
+      .then((r) => r.data),
 
   createWorkshopOrder: (workshopId) =>
     api.post(`/payments/workshop/${workshopId}/create-order`).then((r) => r.data),

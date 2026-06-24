@@ -36,6 +36,7 @@ import AdminWorkshopsPage from "../pages/Admin/WorkshopsPage";
 import BatchesPage from "../pages/Admin/BatchesPage";
 import SchedulePage from "../pages/Admin/SchedulePage";
 import CompaniesPage from "../pages/Admin/CompaniesPage";
+import ReferralCodesPage from "../pages/Admin/ReferralCodesPage";
 import ChatPage from "../pages/Admin/ChatPage";
 import LiveClassesPage from "../pages/Admin/LiveClassesPage";
 import StaffAdminsPage from "../pages/Admin/StaffAdminsPage";
@@ -91,6 +92,7 @@ const AppRoutes = () => (
       <Route path="tutors" element={<TutorsPage />} />
       <Route path="students" element={<StudentsPage />} />
       <Route path="courses" element={<AdminCoursesPage />} />
+      <Route path="referral-codes" element={<ReferralCodesPage />} />
       <Route path="workshops" element={<AdminWorkshopsPage />} />
       <Route path="batches" element={<BatchesPage />} />
       <Route path="schedule" element={<SchedulePage />} />
