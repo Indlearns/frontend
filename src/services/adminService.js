@@ -66,6 +66,9 @@ export const adminService = {
 
   createReferralCode: (data) => api.post("/admin/referral-codes", data).then((r) => r.data),
   getReferralCodes: () => api.get("/admin/referral-codes").then((r) => r.data),
+  getReferralCodeUsages: (id) =>
+    api.get(`/admin/referral-codes/${id}/usages`).then((r) => r.data),
+  getAllReferralUsages: () => api.get("/admin/referral-codes/usages").then((r) => r.data),
   updateReferralCode: (id, data) => api.put(`/admin/referral-codes/${id}`, data).then((r) => r.data),
   deleteReferralCode: (id) => api.delete(`/admin/referral-codes/${id}`).then((r) => r.data),
 };

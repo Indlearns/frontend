@@ -55,6 +55,61 @@ const formatScopeSummary = (item) => {
   return parts.join(" · ");
 };
 
+const formatDate = (value) =>
+  value
+    ? new Date(value).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+    : "—";
+
+const itemTypeLabel = (type) => {
+  if (type === "hackathon") return "Hackathon";
+  if (type === "workshop") return "Workshop";
+  return "Course";
+};
+
+const UsageTable = ({ usages, emptyMessage, showCode = false }) => {
+  if (!usages.length) {
+    return <p className="text-sm text-slate-500 py-2">{emptyMessage}</p>;
+  }
+
+  return (
+    <div className="overflow-x-auto mt-3">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-left text-slate-500 border-b border-brand-100">
+            {showCode && <th className="py-2 pr-3 font-medium">Code</th>}
+            <th className="py-2 pr-3 font-medium">Customer</th>
+            <th className="py-2 pr-3 font-medium">Email</th>
+            <th className="py-2 pr-3 font-medium">Phone</th>
+            <th className="py-2 pr-3 font-medium">Item</th>
+            <th className="py-2 pr-3 font-medium">Discount</th>
+            <th className="py-2 pr-3 font-medium">Paid</th>
+            <th className="py-2 font-medium">Used on</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usages.map((row) => (
+            <tr key={row._id} className="border-b border-brand-50 last:border-0">
+              {showCode && (
+                <td className="py-2 pr-3 font-mono text-xs">{row.referralCode || "—"}</td>
+              )}
+              <td className="py-2 pr-3 font-medium">{row.student?.name || "—"}</td>
+              <td className="py-2 pr-3">{row.student?.email || "—"}</td>
+              <td className="py-2 pr-3">{row.student?.phone || "—"}</td>
+              <td className="py-2 pr-3">
+                <span className="text-xs text-slate-500 block">{itemTypeLabel(row.itemType)}</span>
+                {row.itemTitle}
+              </td>
+              <td className="py-2 pr-3">{row.discountAmount} INR</td>
+              <td className="py-2 pr-3">{row.amountPaid} INR</td>
+              <td className="py-2 whitespace-nowrap">{formatDate(row.usedAt)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 const ReferralCodesPage = () => {
   const [codes, setCodes] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -64,6 +119,12 @@ const ReferralCodesPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [expandedCodeId, setExpandedCodeId] = useState(null);
+  const [usagesByCode, setUsagesByCode] = useState({});
+  const [loadingUsagesId, setLoadingUsagesId] = useState(null);
+  const [allUsages, setAllUsages] = useState([]);
+  const [loadingAllUsages, setLoadingAllUsages] = useState(false);
+  const [showAllUsages, setShowAllUsages] = useState(false);
 
   const load = async () => {
     const [codesRes, coursesRes, workshopsRes] = await Promise.all([
@@ -143,6 +204,43 @@ const ReferralCodesPage = () => {
     if (editingId === id) resetForm();
     await adminService.deleteReferralCode(id);
     load();
+  };
+
+  const toggleUsages = async (codeId) => {
+    if (expandedCodeId === codeId) {
+      setExpandedCodeId(null);
+      return;
+    }
+
+    setExpandedCodeId(codeId);
+    setLoadingUsagesId(codeId);
+    try {
+      const r = await adminService.getReferralCodeUsages(codeId);
+      if (r.success) {
+        setUsagesByCode((prev) => ({ ...prev, [codeId]: r.data.usages }));
+      }
+    } catch {
+      setUsagesByCode((prev) => ({ ...prev, [codeId]: [] }));
+    } finally {
+      setLoadingUsagesId(null);
+    }
+  };
+
+  const loadAllUsages = async () => {
+    if (showAllUsages) {
+      setShowAllUsages(false);
+      return;
+    }
+    setShowAllUsages(true);
+    if (allUsages.length) return;
+
+    setLoadingAllUsages(true);
+    try {
+      const r = await adminService.getAllReferralUsages();
+      if (r.success) setAllUsages(r.data);
+    } finally {
+      setLoadingAllUsages(false);
+    }
   };
 
   return (
@@ -244,7 +342,16 @@ const ReferralCodesPage = () => {
         </form>
 
         <div className="glass-card p-6">
-          <h2 className="font-semibold text-lg mb-4">Existing codes</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h2 className="font-semibold text-lg">Existing codes</h2>
+            <Button type="button" variant="outline" onClick={loadAllUsages} disabled={loadingAllUsages}>
+              {loadingAllUsages
+                ? "Loading..."
+                : showAllUsages
+                  ? "Hide all usage"
+                  : "View all customer usage"}
+            </Button>
+          </div>
           {codes.length === 0 ? (
             <p className="text-sm text-slate-500">No referral codes yet.</p>
           ) : (
@@ -277,6 +384,13 @@ const ReferralCodesPage = () => {
                       </button>
                       <button
                         type="button"
+                        onClick={() => toggleUsages(item._id)}
+                        className="text-xs text-brand-700 hover:underline"
+                      >
+                        {expandedCodeId === item._id ? "Hide customers" : "View customers"}
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => handleEdit(item)}
                         className="text-xs text-brand-600 hover:underline"
                       >
@@ -291,12 +405,38 @@ const ReferralCodesPage = () => {
                       </button>
                     </div>
                   </div>
+                  {expandedCodeId === item._id && (
+                    <div className="mt-3 pt-3 border-t border-brand-100">
+                      {loadingUsagesId === item._id ? (
+                        <p className="text-sm text-slate-500">Loading customer details...</p>
+                      ) : (
+                        <UsageTable
+                          usages={usagesByCode[item._id] || []}
+                          emptyMessage="No customers have used this code yet."
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {showAllUsages && (
+        <div className="glass-card p-6 mt-8">
+          <h2 className="font-semibold text-lg mb-2">All referral code usage</h2>
+          <p className="text-sm text-slate-500 mb-4">
+            Customers who completed checkout with a referral code (courses, workshops, hackathons).
+          </p>
+          {loadingAllUsages ? (
+            <p className="text-sm text-slate-500">Loading...</p>
+          ) : (
+            <UsageTable usages={allUsages} emptyMessage="No referral usage recorded yet." showCode />
+          )}
+        </div>
+      )}
     </div>
   );
 };
