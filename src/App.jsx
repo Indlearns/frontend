@@ -1,6 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
 import AppRoutes from "./routes/AppRoutes";
 
 /**
@@ -12,6 +13,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <GoogleAnalytics />
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
