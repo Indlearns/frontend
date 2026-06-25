@@ -1,9 +1,12 @@
-import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import Logo from "../../common/Logo";
 import ThemeToggle from "../../layout/ThemeToggle";
+import ProfileCompletionPrompt from "../ProfileCompletionPrompt";
 import { useAuth } from "../../../contexts/AuthContext";
+import { studentService } from "../../../services/studentService";
+import { isStudentProfileComplete } from "../../../utils/studentProfileCompletion";
 
 const nav = [
   { to: "/student", label: "Overview", end: true },
@@ -23,6 +26,41 @@ const nav = [
 const StudentLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const [profilePromptOpen, setProfilePromptOpen] = useState(false);
+  const [profileSnapshot, setProfileSnapshot] = useState(null);
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
+
+  const checkProfile = useCallback(async () => {
+    if (user?.role !== "student") return;
+    try {
+      const r = await studentService.getProfile();
+      if (!r.success) return;
+      setProfileSnapshot(r.data);
+      const complete = isStudentProfileComplete(r.data.user, r.data.profile);
+      setProfileIncomplete(!complete);
+      const dismissed = sessionStorage.getItem("profileCompletionDismissed");
+      const onProfilePage = location.pathname.startsWith("/student/profile");
+      if (!complete && !dismissed && !onProfilePage) {
+        setProfilePromptOpen(true);
+      } else if (complete) {
+        setProfilePromptOpen(false);
+        sessionStorage.removeItem("profileCompletionDismissed");
+      }
+    } catch {
+      // ignore
+    }
+  }, [user?.role, location.pathname]);
+
+  useEffect(() => {
+    checkProfile();
+  }, [checkProfile]);
+
+  useEffect(() => {
+    const onUpdated = () => checkProfile();
+    window.addEventListener("student-profile-updated", onUpdated);
+    return () => window.removeEventListener("student-profile-updated", onUpdated);
+  }, [checkProfile]);
 
   const linkClass = ({ isActive }) =>
     `block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -59,7 +97,15 @@ const StudentLayout = () => {
               className={linkClass}
               onClick={() => setSidebarOpen(false)}
             >
-              {item.label}
+              <span className="flex items-center justify-between gap-2">
+                {item.label}
+                {item.to === "/student/profile" && profileIncomplete && (
+                  <span
+                    className="shrink-0 w-2 h-2 rounded-full bg-amber-500"
+                    title="Complete your profile"
+                  />
+                )}
+              </span>
             </NavLink>
           ))}
         </nav>
@@ -96,6 +142,17 @@ const StudentLayout = () => {
           <Outlet />
         </main>
       </div>
+
+      <ProfileCompletionPrompt
+        open={profilePromptOpen}
+        initialUser={profileSnapshot?.user}
+        initialProfile={profileSnapshot?.profile}
+        onClose={() => setProfilePromptOpen(false)}
+        onComplete={() => {
+          setProfilePromptOpen(false);
+          setProfileIncomplete(false);
+        }}
+      />
     </div>
   );
 };

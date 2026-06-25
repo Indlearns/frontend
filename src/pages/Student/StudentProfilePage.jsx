@@ -57,6 +57,7 @@ const StudentProfilePage = () => {
       education: form.education,
       experience: form.experience,
     });
+    window.dispatchEvent(new CustomEvent("student-profile-updated"));
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
