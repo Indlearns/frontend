@@ -89,9 +89,9 @@ const SuperAdminLoginPage = () => {
         {info && (
           <div className="mb-4 p-3 rounded-lg bg-brand-950/50 text-brand-200 text-sm">{info}</div>
         )}
-        {devCode && (
+        {devCode && import.meta.env.DEV && (
           <div className="mb-4 p-3 rounded-lg bg-amber-950/50 text-amber-200 text-sm text-center">
-            Dev code: <strong className="text-lg tracking-widest">{devCode}</strong>
+            Local dev code: <strong className="text-lg tracking-widest">{devCode}</strong>
           </div>
         )}
 
