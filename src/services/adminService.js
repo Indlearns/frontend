@@ -71,4 +71,19 @@ export const adminService = {
   getAllReferralUsages: () => api.get("/admin/referral-codes/usages").then((r) => r.data),
   updateReferralCode: (id, data) => api.put(`/admin/referral-codes/${id}`, data).then((r) => r.data),
   deleteReferralCode: (id) => api.delete(`/admin/referral-codes/${id}`).then((r) => r.data),
+
+  createTutorShowcase: (formData) =>
+    api
+      .post("/admin/tutor-showcase", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data),
+  getTutorShowcase: () => api.get("/admin/tutor-showcase").then((r) => r.data),
+  updateTutorShowcase: (id, formData) =>
+    api
+      .put(`/admin/tutor-showcase/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data),
+  deleteTutorShowcase: (id) => api.delete(`/admin/tutor-showcase/${id}`).then((r) => r.data),
 };

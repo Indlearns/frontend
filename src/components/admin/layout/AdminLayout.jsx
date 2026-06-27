@@ -13,6 +13,7 @@ import {
   FiVideo,
   FiShield,
   FiTag,
+  FiStar,
   FiMenu,
   FiX,
   FiLogOut,
@@ -24,6 +25,7 @@ import { ROLES } from "../../../utils/constants";
 const navItems = [
   { to: "/admin", label: "Overview", icon: FiHome, end: true },
   { to: "/admin/tutors", label: "Tutors", icon: FiUsers },
+  { to: "/admin/tutor-showcase", label: "Tutor showcase", icon: FiStar },
   { to: "/admin/students", label: "Students", icon: FiUser },
   { to: "/admin/courses", label: "Courses", icon: FiBook },
   { to: "/admin/referral-codes", label: "Referral codes", icon: FiTag },

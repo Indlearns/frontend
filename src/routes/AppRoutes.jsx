@@ -37,6 +37,7 @@ import BatchesPage from "../pages/Admin/BatchesPage";
 import SchedulePage from "../pages/Admin/SchedulePage";
 import CompaniesPage from "../pages/Admin/CompaniesPage";
 import ReferralCodesPage from "../pages/Admin/ReferralCodesPage";
+import TutorShowcasePage from "../pages/Admin/TutorShowcasePage";
 import ChatPage from "../pages/Admin/ChatPage";
 import LiveClassesPage from "../pages/Admin/LiveClassesPage";
 import StaffAdminsPage from "../pages/Admin/StaffAdminsPage";
@@ -90,6 +91,7 @@ const AppRoutes = () => (
     >
       <Route index element={<OverviewPage />} />
       <Route path="tutors" element={<TutorsPage />} />
+      <Route path="tutor-showcase" element={<TutorShowcasePage />} />
       <Route path="students" element={<StudentsPage />} />
       <Route path="courses" element={<AdminCoursesPage />} />
       <Route path="referral-codes" element={<ReferralCodesPage />} />

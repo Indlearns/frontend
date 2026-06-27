@@ -10,6 +10,7 @@ import {
   FiCalendar,
   FiArrowRight,
   FiCheckCircle,
+  FiUser,
 } from "react-icons/fi";
 import Button from "../../components/common/Button";
 import { FEATURES, STATS, APP_TAGLINE, ROLES } from "../../utils/constants";
@@ -17,6 +18,7 @@ import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
 import { useAuth } from "../../contexts/AuthContext";
 import { buildHomeEventPayload } from "../../utils/eventPaths";
+import { getImageUrl } from "../../utils/media";
 
 const iconMap = {
   live: FiVideo,
@@ -63,6 +65,7 @@ const HomePage = () => {
 
   const homeWorkshops = home?.workshops ?? [];
   const homeHackathons = home?.hackathons ?? [];
+  const tutorShowcase = home?.tutorShowcase ?? [];
 
   const counts = home?.counts;
   const dynamicStats = counts
@@ -268,6 +271,57 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {tutorShowcase.length > 0 && (
+        <section className="py-16 lg:py-20 bg-slate-50/80 dark:bg-slate-900/30">
+          <div className="section-container">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <h2 className="section-title text-slate-900 dark:text-white">Meet our tutors</h2>
+              <p className="text-slate-600 dark:text-slate-400 mt-3">
+                Learn from experienced mentors who guide students through live classes and real projects.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {tutorShowcase.map((tutor, i) => (
+                <motion.article
+                  key={tutor._id}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  className="glass-card p-6 lg:p-8 flex flex-col h-full"
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    {tutor.imageUrl ? (
+                      <img
+                        src={getImageUrl(tutor.imageUrl)}
+                        alt=""
+                        className="w-14 h-14 rounded-full object-cover border-2 border-brand-200"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center text-brand-600">
+                        <FiUser size={24} />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">
+                        {tutor.name}
+                      </h3>
+                      <p className="text-sm text-brand-600 dark:text-brand-400">{tutor.experience}</p>
+                    </div>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
+                    <span className="text-brand-400 text-2xl leading-none align-top">“</span>
+                    {tutor.description}
+                    <span className="text-brand-400 text-2xl leading-none">”</span>
+                  </p>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-20 lg:py-28">
         <div className="section-container">
