@@ -5,9 +5,9 @@ const LiveClassesPage = () => (
   <div>
     <PageHeader
       title="Live classes"
-      subtitle="Join any scheduled batch session. Admin and participants can start the class."
+      subtitle="Join any scheduled batch session. Recording starts for tutor/admin; students can watch saved recordings below."
     />
-    <LiveClassesPanel title="" />
+    <LiveClassesPanel title="" showRecordings />
   </div>
 );
 

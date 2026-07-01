@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
   FiMic,
   FiMicOff,
@@ -13,6 +13,7 @@ import {
   FiSquare,
 } from "react-icons/fi";
 import { useIndLearnVideo } from "../../hooks/useIndLearnVideo";
+import { useClassRecorder } from "../../hooks/useClassRecorder";
 
 const VideoTile = ({ stream, name, muted = false, handRaised = false, className = "" }) => {
   const ref = useRef(null);
@@ -48,17 +49,24 @@ const VideoTile = ({ stream, name, muted = false, handRaised = false, className 
 };
 
 /** embedded = in-page panel, minimized = floating PiP, fullscreen = overlay */
-const IndLearnVideoRoom = ({
+const IndLearnVideoRoom = forwardRef(({
   roomId,
   displayName = "IndLearn User",
   iceServers,
   className = "",
   title = "",
+  scheduleId,
+  shouldRecord = false,
+  onEndClass,
   onLeave,
-}) => {
+  uploading = false,
+}, ref) => {
   const [chatText, setChatText] = useState("");
   const [viewMode, setViewMode] = useState("embedded");
   const containerRef = useRef(null);
+  const videoGridRef = useRef(null);
+  const autoRecordStarted = useRef(false);
+  const [endingClass, setEndingClass] = useState(false);
 
   const {
     peers,
@@ -89,6 +97,27 @@ const IndLearnVideoRoom = ({
     enabled: Boolean(roomId),
   });
 
+  const { isRecording, recordingSeconds, startRecording, stopRecording } = useClassRecorder({
+    enabled: shouldRecord,
+    containerRef: videoGridRef,
+    localStream,
+    peers,
+  });
+
+  useEffect(() => {
+    if (!joined || !shouldRecord || autoRecordStarted.current) return;
+    const timer = setTimeout(() => {
+      if (startRecording()) autoRecordStarted.current = true;
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [joined, shouldRecord, localStream, peers.length, startRecording]);
+
+  const formatRecTime = (s) => {
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${String(r).padStart(2, "0")}`;
+  };
+
   const handleLeave = () => {
     if (document.fullscreenElement === containerRef.current) {
       document.exitFullscreen?.().catch(() => {});
@@ -96,6 +125,27 @@ const IndLearnVideoRoom = ({
     leave();
     onLeave?.();
   };
+
+  const handleEndClass = async () => {
+    if (endingClass || uploading) return;
+    setEndingClass(true);
+    try {
+      const { blob, durationSeconds } = await stopRecording();
+      if (scheduleId && blob && onEndClass) {
+        await onEndClass({ blob, durationSeconds, scheduleId });
+      }
+    } catch {
+      /* parent may surface error */
+    } finally {
+      setEndingClass(false);
+      handleLeave();
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    endClass: handleEndClass,
+    stopRecording,
+  }));
 
   const handleSendChat = (e) => {
     e.preventDefault();
@@ -182,6 +232,12 @@ const IndLearnVideoRoom = ({
         <p className="text-sm font-semibold text-white truncate flex-1">
           {title || "Video call"}
           {joined && <span className="text-emerald-400 font-normal ml-2">· Live</span>}
+          {isRecording && (
+            <span className="text-red-400 font-normal ml-2 inline-flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              REC {formatRecTime(recordingSeconds)}
+            </span>
+          )}
         </p>
         <div className="flex items-center gap-1 shrink-0">
           {viewMode !== "embedded" && (
@@ -248,6 +304,7 @@ const IndLearnVideoRoom = ({
       <div className={`flex flex-1 min-h-0 ${viewMode === "fullscreen" ? "h-[calc(100vh-7rem)]" : ""}`}>
         <div className="flex-1 flex flex-col min-w-0">
           <div
+            ref={videoGridRef}
             className={`flex-1 p-2 min-h-0 overflow-y-auto ${
               viewMode === "minimized" ? "max-h-[180px]" : ""
             }`}
@@ -342,14 +399,36 @@ const IndLearnVideoRoom = ({
                 </button>
               </>
             )}
-            <button
-              type="button"
-              onClick={handleLeave}
-              className="p-2.5 sm:p-3 rounded-full bg-red-600 text-white"
-              title="Leave call"
-            >
-              <FiPhoneOff />
-            </button>
+            {shouldRecord ? (
+              <button
+                type="button"
+                onClick={handleEndClass}
+                disabled={endingClass || uploading}
+                className="px-3 py-2 rounded-full bg-amber-600 text-white text-sm font-medium disabled:opacity-50"
+                title="End class and save recording"
+              >
+                {endingClass || uploading ? "Saving…" : "End class"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleLeave}
+                className="p-2.5 sm:p-3 rounded-full bg-red-600 text-white"
+                title="Leave call"
+              >
+                <FiPhoneOff />
+              </button>
+            )}
+            {shouldRecord && (
+              <button
+                type="button"
+                onClick={handleLeave}
+                className="p-2.5 sm:p-3 rounded-full bg-slate-700 text-white"
+                title="Leave without ending class"
+              >
+                <FiPhoneOff />
+              </button>
+            )}
           </div>
         </div>
 
@@ -415,6 +494,8 @@ const IndLearnVideoRoom = ({
       </div>
     </div>
   );
-};
+});
+
+IndLearnVideoRoom.displayName = "IndLearnVideoRoom";
 
 export default IndLearnVideoRoom;

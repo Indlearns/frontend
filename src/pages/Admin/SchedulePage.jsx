@@ -4,6 +4,7 @@ import { chatService } from "../../services/chatService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
 import IndLearnVideoRoom from "../../components/video/IndLearnVideoRoom";
+import ClassRecordingsList from "../../components/classes/ClassRecordingsList";
 import { WEEKDAYS, previewScheduleDates } from "../../utils/scheduleDates";
 import { toDateInputValue } from "../../utils/media";
 
@@ -28,6 +29,8 @@ const SchedulePage = () => {
   const [batches, setBatches] = useState([]);
   const [activeClass, setActiveClass] = useState(null);
   const [video, setVideo] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [recordingsKey, setRecordingsKey] = useState(0);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -195,6 +198,20 @@ const SchedulePage = () => {
     if (r.success) {
       setVideo(r.data);
       load();
+    }
+  };
+
+  const handleEndClass = async ({ blob, durationSeconds, scheduleId }) => {
+    setUploading(true);
+    try {
+      await chatService.uploadClassRecording(scheduleId, blob, durationSeconds);
+      setRecordingsKey((k) => k + 1);
+      load();
+    } catch {
+      alert("Could not save recording. Please try again.");
+      throw new Error("upload failed");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -498,7 +515,12 @@ const SchedulePage = () => {
             </ul>
           </div>
 
-        <div className="glass-card p-2 min-h-[320px] flex flex-col">
+        <div className="glass-card p-2 min-h-[320px] flex flex-col relative">
+          {uploading && (
+            <div className="absolute inset-0 z-10 bg-slate-900/70 flex items-center justify-center rounded-xl text-white text-sm">
+              Saving class recording…
+            </div>
+          )}
           {video?.roomId ? (
             <IndLearnVideoRoom
               roomId={video.roomId || video.roomName}
@@ -506,9 +528,14 @@ const SchedulePage = () => {
               iceServers={video.iceServers}
               title={activeClass?.title}
               className="flex-1 min-h-[280px]"
+              scheduleId={video.scheduleId || activeClass?._id}
+              shouldRecord={Boolean(video.canRecord)}
+              onEndClass={handleEndClass}
+              uploading={uploading}
               onLeave={() => {
                 setActiveClass(null);
                 setVideo(null);
+                load();
               }}
             />
           ) : (
@@ -519,6 +546,13 @@ const SchedulePage = () => {
           </div>
         </div>
       </div>
+
+      <ClassRecordingsList
+        title="All batch recordings"
+        canDelete
+        refreshKey={recordingsKey}
+        className="mt-8"
+      />
     </div>
   );
 };

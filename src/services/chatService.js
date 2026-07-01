@@ -22,4 +22,25 @@ export const chatService = {
     api.post(`/chat/live-classes/${scheduleId}/join`).then((r) => r.data),
   getLiveClassVideo: (scheduleId) =>
     api.post(`/chat/live-classes/${scheduleId}/join`).then((r) => r.data),
+  uploadClassRecording: (scheduleId, blob, durationSeconds) => {
+    const form = new FormData();
+    form.append("recording", blob, `class-${scheduleId}.webm`);
+    form.append("durationSeconds", String(durationSeconds || 0));
+    return api
+      .post(`/chat/live-classes/${scheduleId}/recordings`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data);
+  },
+  listClassRecordings: (batchId) =>
+    api
+      .get("/chat/recordings", { params: batchId ? { batchId } : {} })
+      .then((r) => r.data),
+  getScheduleRecordings: (scheduleId) =>
+    api.get(`/chat/live-classes/${scheduleId}/recordings`).then((r) => r.data),
+  deleteClassRecording: (id) => api.delete(`/chat/recordings/${id}`).then((r) => r.data),
+  fetchRecordingBlobUrl: async (id) => {
+    const res = await api.get(`/chat/recordings/${id}/stream`, { responseType: "blob" });
+    return URL.createObjectURL(res.data);
+  },
 };

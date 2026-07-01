@@ -1,24 +1,54 @@
 import { useEffect, useState } from "react";
 import { chatService } from "../../services/chatService";
 import IndLearnVideoRoom from "../video/IndLearnVideoRoom";
+import ClassRecordingsList from "../classes/ClassRecordingsList";
 import Button from "../common/Button";
 
-const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
+const LiveClassesPanel = ({
+  title = "Live classes",
+  subtitle,
+  batchId,
+  showRecordings = true,
+}) => {
   const [classes, setClasses] = useState([]);
   const [active, setActive] = useState(null);
   const [video, setVideo] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [recordingsKey, setRecordingsKey] = useState(0);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const canDeleteRecordings = user.role === "admin" || user.role === "superadmin";
 
-  useEffect(() => {
+  const refreshClasses = () => {
     chatService.getLiveClasses().then((r) => {
       if (r.success) setClasses(r.data);
     });
+  };
+
+  useEffect(() => {
+    refreshClasses();
   }, []);
 
   const joinClass = async (schedule) => {
     setActive(schedule);
     const r = await chatService.joinLiveClass(schedule._id);
-    if (r.success) setVideo(r.data);
+    if (r.success) {
+      setVideo(r.data);
+      refreshClasses();
+    }
+  };
+
+  const handleEndClass = async ({ blob, durationSeconds, scheduleId }) => {
+    setUploading(true);
+    try {
+      await chatService.uploadClassRecording(scheduleId, blob, durationSeconds);
+      setRecordingsKey((k) => k + 1);
+      refreshClasses();
+    } catch {
+      alert("Could not save recording. Please try again.");
+      throw new Error("upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const joinLabel = (status) =>
@@ -30,6 +60,8 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
       month: "short",
       day: "numeric",
     });
+
+  const scheduleId = video?.scheduleId || active?._id;
 
   return (
     <div>
@@ -66,7 +98,12 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
             <p className="text-sm text-slate-500">No upcoming classes scheduled.</p>
           )}
         </div>
-        <div className="glass-card p-2 min-h-[360px] flex flex-col">
+        <div className="glass-card p-2 min-h-[360px] flex flex-col relative">
+          {uploading && (
+            <div className="absolute inset-0 z-10 bg-slate-900/70 flex items-center justify-center rounded-xl text-white text-sm">
+              Saving class recording…
+            </div>
+          )}
           {video?.roomId ? (
             <IndLearnVideoRoom
               roomId={video.roomId || video.roomName}
@@ -74,9 +111,14 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
               iceServers={video.iceServers}
               title={active?.title}
               className="flex-1 min-h-[320px]"
+              scheduleId={scheduleId}
+              shouldRecord={Boolean(video.canRecord)}
+              onEndClass={handleEndClass}
+              uploading={uploading}
               onLeave={() => {
                 setActive(null);
                 setVideo(null);
+                refreshClasses();
               }}
             />
           ) : (
@@ -86,6 +128,16 @@ const LiveClassesPanel = ({ title = "Live classes", subtitle }) => {
           )}
         </div>
       </div>
+
+      {showRecordings && (
+        <ClassRecordingsList
+          batchId={batchId}
+          title={batchId ? "Batch recordings" : "Class recordings"}
+          canDelete={canDeleteRecordings}
+          refreshKey={recordingsKey}
+          className="mt-6"
+        />
+      )}
     </div>
   );
 };
