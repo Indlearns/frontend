@@ -290,28 +290,26 @@ const HomePage = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="glass-card p-6 lg:p-8 flex flex-col h-full"
+                  className="glass-card p-6 lg:p-8 flex flex-col h-full text-center"
                 >
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="flex flex-col items-center mb-5">
                     {tutor.imageUrl ? (
                       <img
                         src={getImageUrl(tutor.imageUrl)}
-                        alt=""
-                        className="w-14 h-14 rounded-full object-cover border-2 border-brand-200"
+                        alt={tutor.name}
+                        className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-brand-200 dark:border-brand-800 shadow-md"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center text-brand-600">
-                        <FiUser size={24} />
+                      <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center text-brand-600 border-4 border-brand-200 dark:border-brand-800">
+                        <FiUser size={40} />
                       </div>
                     )}
-                    <div>
-                      <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">
-                        {tutor.name}
-                      </h3>
-                      <p className="text-sm text-brand-600 dark:text-brand-400">{tutor.experience}</p>
-                    </div>
+                    <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mt-4">
+                      {tutor.name}
+                    </h3>
+                    <p className="text-sm text-brand-600 dark:text-brand-400">{tutor.experience}</p>
                   </div>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed flex-1 text-left sm:text-center">
                     <span className="text-brand-400 text-2xl leading-none align-top">“</span>
                     {tutor.description}
                     <span className="text-brand-400 text-2xl leading-none">”</span>
