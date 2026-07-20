@@ -105,7 +105,14 @@ const StudentDetail = ({ detail, loading }) => {
                 className="p-3 rounded-lg border border-brand-100 dark:border-brand-800 text-sm"
               >
                 <p className="font-medium">{b.name}</p>
-                <p className="text-slate-500">Course: {b.course?.title || "—"}</p>
+                <p className="text-slate-500">
+                  {b.sourceType === "hackathon"
+                    ? "Hackathon"
+                    : b.sourceType === "workshop" || b.workshop
+                      ? "Workshop"
+                      : "Course"}
+                  : {b.course?.title || b.workshop?.title || "—"}
+                </p>
                 <p className="text-slate-500">Tutor: {b.tutor?.name || "Not assigned"}</p>
                 <p className="text-xs capitalize text-brand-600 mt-1">{b.status}</p>
               </li>

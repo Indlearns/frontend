@@ -24,11 +24,15 @@ const StudentCourseDashboardPage = () => {
       <Link to="/student/courses" className="text-sm text-brand-600 hover:underline">
         ← My courses
       </Link>
-      <h1 className="text-2xl font-bold mt-2">{batch.course?.title}</h1>
+      <h1 className="text-2xl font-bold mt-2">
+        {batch.course?.title || batch.workshop?.title}
+      </h1>
       <p className="text-brand-600 text-sm">{batch.name}</p>
-      {batch.course?.description && (
+      {(batch.course?.description || batch.workshop?.description) && (
         <div className="mt-3 max-w-2xl">
-          <FormattedDescription text={batch.course.description} />
+          <FormattedDescription
+            text={batch.course?.description || batch.workshop?.description}
+          />
         </div>
       )}
 

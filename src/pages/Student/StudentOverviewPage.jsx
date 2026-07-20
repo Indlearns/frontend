@@ -98,7 +98,7 @@ const StudentOverviewPage = () => {
               to={`/student/courses/${e.batch._id}`}
               className="glass-card p-5 hover:border-brand-500"
             >
-              <p className="font-bold">{e.batch.course?.title}</p>
+              <p className="font-bold">{e.batch.course?.title || e.batch.workshop?.title}</p>
               <p className="text-sm text-slate-500">{e.progress?.overallPercent || 0}% complete</p>
             </Link>
           ))}

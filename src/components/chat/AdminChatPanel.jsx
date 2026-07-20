@@ -110,7 +110,8 @@ const AdminChatPanel = () => {
     return directory.batches.filter(
       (b) =>
         b.name?.toLowerCase().includes(q) ||
-        b.course?.title?.toLowerCase().includes(q)
+        b.course?.title?.toLowerCase().includes(q) ||
+        b.workshop?.title?.toLowerCase().includes(q)
     );
   }, [directory, search]);
 
@@ -264,7 +265,7 @@ const AdminChatPanel = () => {
               >
                 <p className="font-medium text-sm">{b.name}</p>
                 <p className="text-xs text-slate-500 mb-2">
-                  {b.course?.title || "Course"} · {b.students?.length || 0} students
+                  {b.course?.title || b.workshop?.title || "Batch"} · {b.students?.length || 0} students
                 </p>
                 <Button
                   type="button"

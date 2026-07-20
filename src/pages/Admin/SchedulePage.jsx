@@ -257,7 +257,7 @@ const SchedulePage = () => {
             <option value="">Select batch</option>
             {batches.map((b) => (
               <option key={b._id} value={b._id}>
-                {b.name} — {b.course?.title} ({b.students?.length || 0} students)
+                {b.name} — {b.course?.title || b.workshop?.title || "—"} ({b.students?.length || 0} students)
               </option>
             ))}
           </select>

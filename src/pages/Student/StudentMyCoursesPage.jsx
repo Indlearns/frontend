@@ -62,9 +62,11 @@ const StudentMyCoursesPage = () => {
             className="glass-card p-5 hover:border-brand-500 transition-colors block"
           >
             <p className="text-xs text-brand-600 font-medium mb-1">{e.batch.name}</p>
-            <h3 className="font-bold text-lg">{e.batch.course?.title}</h3>
+            <h3 className="font-bold text-lg">
+              {e.batch.course?.title || e.batch.workshop?.title}
+            </h3>
             <p className="text-sm text-slate-500 mt-2 line-clamp-2">
-              {e.batch.course?.description}
+              {e.batch.course?.description || e.batch.workshop?.description}
             </p>
             <div className="mt-4">
               <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">

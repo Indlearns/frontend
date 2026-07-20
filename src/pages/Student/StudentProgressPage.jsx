@@ -29,7 +29,9 @@ const StudentProgressPage = () => {
           <div key={p.batchId} className="glass-card p-6">
             <div className="flex flex-wrap justify-between gap-2 mb-3">
               <div>
-                <h2 className="font-bold text-lg">{p.course?.title}</h2>
+                <h2 className="font-bold text-lg">
+                  {p.course?.title || p.workshop?.title}
+                </h2>
                 <p className="text-sm text-brand-600">{p.batchName}</p>
               </div>
               <Link

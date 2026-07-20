@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { adminService } from "../../services/adminService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
 import { toDateInputValue } from "../../utils/media";
+import { getBatchItemLabel, getBatchItemTitle } from "../../utils/batchSource";
 
 const emptyForm = {
   name: "",
+  sourceType: "course",
   course: "",
+  workshop: "",
   tutor: "",
   startDate: "",
   endDate: "",
@@ -16,20 +19,32 @@ const emptyForm = {
 const BatchesPage = () => {
   const [batches, setBatches] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [workshops, setWorkshops] = useState([]);
   const [tutors, setTutors] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const workshopOptions = useMemo(
+    () => workshops.filter((w) => (w.eventType || "workshop") !== "hackathon"),
+    [workshops]
+  );
+  const hackathonOptions = useMemo(
+    () => workshops.filter((w) => w.eventType === "hackathon"),
+    [workshops]
+  );
+
   const load = async () => {
-    const [b, c, t] = await Promise.all([
+    const [b, c, w, t] = await Promise.all([
       adminService.getBatches(),
       adminService.getCourses(),
+      adminService.getWorkshops(),
       adminService.getTutors(),
     ]);
     if (b.success) setBatches(b.data);
     if (c.success) setCourses(c.data);
+    if (w.success) setWorkshops(w.data);
     if (t.success) setTutors(t.data);
   };
 
@@ -44,10 +59,14 @@ const BatchesPage = () => {
   };
 
   const startEdit = (batch) => {
+    const sourceType =
+      batch.sourceType || (batch.workshop ? "workshop" : "course");
     setEditingId(batch._id);
     setForm({
       name: batch.name || "",
+      sourceType,
       course: batch.course?._id || batch.course || "",
+      workshop: batch.workshop?._id || batch.workshop || "",
       tutor: batch.tutor?._id || batch.tutor || "",
       startDate: toDateInputValue(batch.startDate),
       endDate: toDateInputValue(batch.endDate),
@@ -57,16 +76,29 @@ const BatchesPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleSourceTypeChange = (sourceType) => {
+    setForm((f) => ({
+      ...f,
+      sourceType,
+      course: sourceType === "course" ? f.course : "",
+      workshop: sourceType === "course" ? "" : f.workshop,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       const payload = {
-        ...form,
+        name: form.name,
+        sourceType: form.sourceType,
+        course: form.sourceType === "course" ? form.course : null,
+        workshop: form.sourceType !== "course" ? form.workshop : null,
         tutor: form.tutor || null,
         startDate: form.startDate || null,
         endDate: form.endDate || null,
+        status: form.status,
       };
       const r = editingId
         ? await adminService.updateBatch(editingId, payload)
@@ -93,11 +125,18 @@ const BatchesPage = () => {
     }
   };
 
+  const itemOptions =
+    form.sourceType === "hackathon"
+      ? hackathonOptions
+      : form.sourceType === "workshop"
+        ? workshopOptions
+        : [];
+
   return (
     <div>
       <PageHeader
         title="Batches"
-        subtitle="Create a batch per course, assign tutor — batch chat is auto-created."
+        subtitle="Create a batch for a course, workshop, or hackathon — assign tutor and batch chat is auto-created."
       />
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
@@ -112,17 +151,47 @@ const BatchesPage = () => {
           />
           <select
             required
-            value={form.course}
-            onChange={(e) => setForm({ ...form, course: e.target.value })}
+            value={form.sourceType}
+            onChange={(e) => handleSourceTypeChange(e.target.value)}
             className="input-field"
           >
-            <option value="">Select course</option>
-            {courses.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.title}
-              </option>
-            ))}
+            <option value="course">Course</option>
+            <option value="workshop">Workshop</option>
+            <option value="hackathon">Hackathon</option>
           </select>
+
+          {form.sourceType === "course" ? (
+            <select
+              required
+              value={form.course}
+              onChange={(e) => setForm({ ...form, course: e.target.value })}
+              className="input-field"
+            >
+              <option value="">Select course</option>
+              {courses.map((c) => (
+                <option key={c._id} value={c._id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select
+              required
+              value={form.workshop}
+              onChange={(e) => setForm({ ...form, workshop: e.target.value })}
+              className="input-field"
+            >
+              <option value="">
+                Select {form.sourceType === "hackathon" ? "hackathon" : "workshop"}
+              </option>
+              {itemOptions.map((w) => (
+                <option key={w._id} value={w._id}>
+                  {w.title}
+                </option>
+              ))}
+            </select>
+          )}
+
           <select
             value={form.tutor}
             onChange={(e) => setForm({ ...form, tutor: e.target.value })}
@@ -183,7 +252,9 @@ const BatchesPage = () => {
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold">{b.name}</p>
-                  <p className="text-sm text-slate-500">Course: {b.course?.title}</p>
+                  <p className="text-sm text-slate-500">
+                    {getBatchItemLabel(b)}: {getBatchItemTitle(b) || "—"}
+                  </p>
                   <p className="text-sm text-slate-500">
                     Tutor: {b.tutor?.name || "Not assigned"}
                   </p>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { tutorService } from "../../services/tutorService";
+import { getBatchItemTitle } from "../../utils/batchSource";
 
 const TutorBatchesPage = () => {
   const [batches, setBatches] = useState([]);
@@ -22,7 +23,7 @@ const TutorBatchesPage = () => {
             <div className="flex justify-between items-start gap-2">
               <div>
                 <h2 className="font-bold text-lg">{b.name}</h2>
-                <p className="text-sm text-brand-600">{b.course?.title}</p>
+                <p className="text-sm text-brand-600">{getBatchItemTitle(b)}</p>
               </div>
               <span className="text-xs px-2 py-1 rounded-full bg-brand-100 dark:bg-brand-900/40 capitalize">
                 {b.status}
