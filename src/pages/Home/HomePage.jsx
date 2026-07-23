@@ -16,6 +16,7 @@ import Button from "../../components/common/Button";
 import { FEATURES, STATS, APP_TAGLINE, ROLES } from "../../utils/constants";
 import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
+import LearnersWorkAtMarquee from "../../components/public/LearnersWorkAtMarquee";
 import { useAuth } from "../../contexts/AuthContext";
 import { buildHomeEventPayload } from "../../utils/eventPaths";
 import { getImageUrl } from "../../utils/media";
@@ -271,6 +272,8 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      <LearnersWorkAtMarquee />
 
       {tutorShowcase.length > 0 && (
         <section className="py-16 lg:py-20 bg-slate-50/80 dark:bg-slate-900/30">

@@ -60,4 +60,52 @@
   .input-field {
     @apply w-full px-4 py-2.5 rounded-xl border border-brand-200 dark:border-brand-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-brand-400 focus:border-brand-400;
   }
+
+  .learners-marquee-row {
+    @apply relative overflow-hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+  }
+
+  .learners-marquee-track {
+    @apply flex w-max gap-4 lg:gap-5;
+    animation: learners-marquee-scroll var(--marquee-duration, 45s) linear infinite;
+  }
+
+  .learners-marquee-reverse {
+    animation-direction: reverse;
+  }
+
+  .learners-marquee-pill {
+    @apply inline-flex items-center gap-3 px-5 py-3 rounded-full border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 shadow-sm shrink-0;
+  }
+
+  @keyframes learners-marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .learners-marquee-track {
+      animation: none;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+      @apply px-4;
+    }
+
+    .learners-marquee-row {
+      mask-image: none;
+      overflow: visible;
+    }
+  }
 }
