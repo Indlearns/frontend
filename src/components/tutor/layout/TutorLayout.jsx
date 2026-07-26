@@ -2,6 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import Logo from "../../common/Logo";
 import ThemeToggle from "../../layout/ThemeToggle";
 import { useAuth } from "../../../contexts/AuthContext";
+import { LiveClassSessionProvider } from "../../../contexts/LiveClassSessionContext";
 
 const nav = [
   { to: "/tutor", label: "Overview", end: true },
@@ -16,7 +17,8 @@ const TutorLayout = () => {
   const { user, logout } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
+    <LiveClassSessionProvider joinMode="tutor" classesPath="/tutor/classes">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
       <aside className="w-64 shrink-0 border-r border-brand-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
         <div className="px-4 pt-5 pb-4 border-b border-brand-100 dark:border-slate-800">
           <Logo variant="sidebar" to="/tutor" />
@@ -59,7 +61,7 @@ const TutorLayout = () => {
           <Outlet />
         </main>
       </div>
-    </div>
+    </LiveClassSessionProvider>
   );
 };
 

@@ -7,6 +7,7 @@ import ProfileCompletionPrompt from "../ProfileCompletionPrompt";
 import { useAuth } from "../../../contexts/AuthContext";
 import { studentService } from "../../../services/studentService";
 import { isStudentProfileComplete } from "../../../utils/studentProfileCompletion";
+import { LiveClassSessionProvider } from "../../../contexts/LiveClassSessionContext";
 
 const nav = [
   { to: "/student", label: "Overview", end: true },
@@ -70,7 +71,8 @@ const StudentLayout = () => {
     }`;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
+    <LiveClassSessionProvider joinMode="chat" classesPath="/student/classes">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 lg:hidden"
@@ -153,7 +155,8 @@ const StudentLayout = () => {
           setProfileIncomplete(false);
         }}
       />
-    </div>
+      </div>
+    </LiveClassSessionProvider>
   );
 };
 
