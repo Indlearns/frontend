@@ -17,6 +17,7 @@ const Footer = () => {
       { label: "Courses", path: "/courses" },
       { label: "Workshops", path: "/workshops" },
       { label: "Hackathons", path: "/events" },
+      { label: "Jobs", path: "/jobs" },
       { label: "Mentorship", path: "/mentorship" },
     ],
     Company: [

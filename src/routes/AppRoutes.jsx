@@ -36,6 +36,7 @@ import AdminWorkshopsPage from "../pages/Admin/WorkshopsPage";
 import BatchesPage from "../pages/Admin/BatchesPage";
 import SchedulePage from "../pages/Admin/SchedulePage";
 import CompaniesPage from "../pages/Admin/CompaniesPage";
+import PublicJobsPage from "../pages/Admin/PublicJobsPage";
 import ReferralCodesPage from "../pages/Admin/ReferralCodesPage";
 import TutorShowcasePage from "../pages/Admin/TutorShowcasePage";
 import ChatPage from "../pages/Admin/ChatPage";
@@ -47,6 +48,7 @@ import CourseDetailPage from "../pages/Public/CourseDetailPage";
 import WorkshopsPage from "../pages/Public/WorkshopsPage";
 import WorkshopDetailPage from "../pages/Public/WorkshopDetailPage";
 import EventsPage from "../pages/Public/EventsPage";
+import JobsPage from "../pages/Public/JobsPage";
 import MentorshipPage from "../pages/Public/MentorshipPage";
 import PrivacyPolicyPage from "../pages/Legal/PrivacyPolicyPage";
 import TermsPage from "../pages/Legal/TermsPage";
@@ -100,6 +102,7 @@ const AppRoutes = () => (
       <Route path="schedule" element={<SchedulePage />} />
       <Route path="live-classes" element={<LiveClassesPage />} />
       <Route path="companies" element={<CompaniesPage />} />
+      <Route path="public-jobs" element={<PublicJobsPage />} />
       <Route path="chat" element={<ChatPage />} />
       <Route path="staff-admins" element={<StaffAdminsPage />} />
     </Route>
@@ -174,6 +177,7 @@ const AppRoutes = () => (
       <Route path="workshops/:id" element={<WorkshopDetailPage />} />
       <Route path="events" element={<EventsPage />} />
       <Route path="events/:id" element={<WorkshopDetailPage />} />
+      <Route path="jobs" element={<JobsPage />} />
       <Route path="mentorship" element={<MentorshipPage />} />
       <Route path="privacy" element={<PrivacyPolicyPage />} />
       <Route path="terms" element={<TermsPage />} />

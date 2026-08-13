@@ -93,4 +93,9 @@ export const adminService = {
       })
       .then((r) => r.data),
   deleteTutorShowcase: (id) => api.delete(`/admin/tutor-showcase/${id}`).then((r) => r.data),
+
+  createPublicJob: (data) => api.post("/admin/public-jobs", data).then((r) => r.data),
+  getPublicJobs: () => api.get("/admin/public-jobs").then((r) => r.data),
+  updatePublicJob: (id, data) => api.put(`/admin/public-jobs/${id}`, data).then((r) => r.data),
+  deletePublicJob: (id) => api.delete(`/admin/public-jobs/${id}`).then((r) => r.data),
 };

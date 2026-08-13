@@ -52,6 +52,7 @@ export const NAV_LINKS = [
   { label: "Courses", path: "/courses" },
   { label: "Workshops", path: "/workshops" },
   { label: "Hackathons", path: "/events" },
+  { label: "Jobs", path: "/jobs" },
   { label: "Mentorship", path: "/mentorship" },
 ];
 
@@ -61,6 +62,7 @@ export const ENROLLED_STUDENT_NAV = [
   { label: "My Courses", path: "/student/courses" },
   { label: "Workshops", path: "/workshops" },
   { label: "Hackathons", path: "/events" },
+  { label: "Jobs", path: "/jobs" },
   { label: "Mentorship", path: "/mentorship" },
   { label: "My Progress", path: "/student/progress" },
   { label: "Career", path: "/student/career" },

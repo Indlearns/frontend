@@ -10,4 +10,5 @@ export const publicService = {
       .then((r) => r.data),
   getWorkshop: (id) => api.get(`/public/workshops/${id}`).then((r) => r.data),
   getCompanies: () => api.get("/public/companies").then((r) => r.data),
+  getJobs: () => api.get("/public/jobs").then((r) => r.data),
 };

@@ -9,6 +9,7 @@ import {
   FiLayers,
   FiClock,
   FiBriefcase,
+  FiGlobe,
   FiMessageCircle,
   FiVideo,
   FiShield,
@@ -34,6 +35,7 @@ const navItems = [
   { to: "/admin/schedule", label: "Class Schedule", icon: FiClock },
   { to: "/admin/live-classes", label: "Live Classes", icon: FiVideo },
   { to: "/admin/companies", label: "Partners", icon: FiBriefcase },
+  { to: "/admin/public-jobs", label: "Public Jobs", icon: FiGlobe },
   { to: "/admin/chat", label: "Conversations", icon: FiMessageCircle },
 ];
 

@@ -36,7 +36,12 @@ const StudentCareerPage = () => {
     <div>
       <h1 className="text-2xl font-bold mb-2">Career</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-6">
-        Jobs from hiring partners. Apply directly — partners can see your course progress.
+        Jobs for enrolled students from hiring partners. Apply in-app or via external links.
+        Looking for open roles without login?{" "}
+        <Link to="/jobs" className="text-brand-600 hover:underline">
+          Browse public jobs
+        </Link>
+        .
       </p>
       {message && <p className="text-sm text-brand-600 mb-4">{message}</p>}
       {data?.courseCategories?.length > 0 && (
