@@ -61,6 +61,7 @@ const TutorLayout = () => {
           <Outlet />
         </main>
       </div>
+      </div>
     </LiveClassSessionProvider>
   );
 };
