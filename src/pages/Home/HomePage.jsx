@@ -140,27 +140,27 @@ const HomePage = () => {
             >
               <div className="glass-card p-8">
                 <p className="text-sm font-semibold text-brand-600 mb-4">On IndLearn now</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30">
+                <div className="flex flex-wrap justify-center gap-4">
+                  <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                     <FiBookOpen className="text-brand-600 mb-2" />
                     <p className="font-bold text-2xl">{counts?.courses ?? "—"}</p>
                     <p className="text-xs text-slate-500">Courses</p>
                   </div>
                   {(counts?.workshops ?? 0) > 0 && (
-                    <div className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30">
+                    <div className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                       <FiCalendar className="text-accent-600 mb-2" />
                       <p className="font-bold text-2xl">{counts.workshops}</p>
                       <p className="text-xs text-slate-500">Workshops</p>
                     </div>
                   )}
                   {(counts?.hackathons ?? 0) > 0 && (
-                    <div className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30">
+                    <div className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                       <FiAward className="text-violet-600 mb-2" />
                       <p className="font-bold text-2xl">{counts.hackathons}</p>
                       <p className="text-xs text-slate-500">Hackathons</p>
                     </div>
                   )}
-                  <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30">
+                  <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                     <FiVideo className="text-brand-600 mb-2" />
                     <p className="font-bold text-sm font-semibold text-slate-800 dark:text-slate-200">
                       Live & chat
@@ -176,7 +176,7 @@ const HomePage = () => {
 
       <section className="py-12 bg-white dark:bg-[#0F2340]/50 border-y border-brand-100 dark:border-brand-900/50">
         <div className="section-container">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-wrap justify-center items-start gap-x-10 sm:gap-x-14 lg:gap-x-20 gap-y-8">
             {dynamicStats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -185,7 +185,7 @@ const HomePage = () => {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-                className="text-center"
+                className="text-center min-w-[120px] sm:min-w-[140px]"
               >
                 <p className="font-display text-3xl lg:text-4xl font-bold text-brand-500 dark:text-brand-400">
                   {stat.value}
