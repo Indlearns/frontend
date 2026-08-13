@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiDownload, FiUsers, FiX } from "react-icons/fi";
 import { adminService } from "../../services/adminService";
-import { downloadCsvFromApi } from "../../utils/downloadCsv";
 import { formatPrice } from "../../utils/media";
 import Button from "../common/Button";
 
@@ -14,10 +13,22 @@ const formatDate = (value) => {
   });
 };
 
+const downloadBlob = (blob, filename) => {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
 const CourseEnrollmentsPanel = ({ courseId, courseTitle, onClose, compact = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [exportingMonth, setExportingMonth] = useState(null);
   const [error, setError] = useState("");
   const [expandedMonth, setExpandedMonth] = useState(null);
 
@@ -44,17 +55,22 @@ const CourseEnrollmentsPanel = ({ courseId, courseTitle, onClose, compact = fals
     };
   }, [courseId]);
 
-  const handleExport = async () => {
-    setExporting(true);
+  const handleExport = async (month) => {
+    if (month) setExportingMonth(month);
+    else setExporting(true);
     try {
-      await downloadCsvFromApi(
-        `/admin/courses/${courseId}/enrollments/export`,
-        `${courseTitle || "course"}_enrollments.csv`
-      );
+      const response = await adminService.exportCourseEnrollments(courseId, month);
+      const disposition = response.headers?.["content-disposition"] || "";
+      const match = disposition.match(/filename="?([^"]+)"?/i);
+      const fallback = month
+        ? `${courseTitle || "course"}_${month}.csv`
+        : `${courseTitle || "course"}_enrollments.csv`;
+      downloadBlob(response.data, match?.[1] || fallback);
     } catch {
       setError("CSV download failed.");
     } finally {
       setExporting(false);
+      setExportingMonth(null);
     }
   };
 
@@ -84,11 +100,11 @@ const CourseEnrollmentsPanel = ({ courseId, courseTitle, onClose, compact = fals
             type="button"
             variant="outline"
             disabled={exporting || loading || !data?.totalEnrollments}
-            onClick={handleExport}
+            onClick={() => handleExport()}
             className="text-sm px-3 py-1.5"
           >
             <FiDownload className="inline mr-1" />
-            {exporting ? "Exporting..." : "Download CSV"}
+            {exporting ? "Exporting..." : "All CSV"}
           </Button>
           {onClose && (
             <button
@@ -117,19 +133,31 @@ const CourseEnrollmentsPanel = ({ courseId, courseTitle, onClose, compact = fals
               key={group.month}
               className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden"
             >
-              <button
-                type="button"
-                onClick={() =>
-                  setExpandedMonth((m) => (m === group.month ? null : group.month))
-                }
-                className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-left"
-              >
-                <span className="font-medium">{group.label}</span>
-                <span className="text-sm text-brand-600">
-                  {group.enrollments.length} enrollment
-                  {group.enrollments.length === 1 ? "" : "s"}
-                </span>
-              </button>
+              <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExpandedMonth((m) => (m === group.month ? null : group.month))
+                  }
+                  className="flex-1 flex items-center justify-between text-left hover:opacity-80"
+                >
+                  <span className="font-medium">{group.label}</span>
+                  <span className="text-sm text-brand-600">
+                    {group.enrollments.length} enrollment
+                    {group.enrollments.length === 1 ? "" : "s"}
+                  </span>
+                </button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={exportingMonth === group.month}
+                  onClick={() => handleExport(group.month)}
+                  className="ml-2 text-xs px-2 py-1 shrink-0"
+                >
+                  <FiDownload className="inline mr-1" />
+                  {exportingMonth === group.month ? "..." : "CSV"}
+                </Button>
+              </div>
               {expandedMonth === group.month && (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

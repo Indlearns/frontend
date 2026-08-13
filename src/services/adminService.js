@@ -31,8 +31,11 @@ export const adminService = {
   deleteCourse: (id) => api.delete(`/admin/courses/${id}`).then((r) => r.data),
   getCourseEnrollments: (id) =>
     api.get(`/admin/courses/${id}/enrollments`).then((r) => r.data),
-  exportCourseEnrollments: (id) =>
-    api.get(`/admin/courses/${id}/enrollments/export`, { responseType: "blob" }),
+  exportCourseEnrollments: (id, month) =>
+    api.get(`/admin/courses/${id}/enrollments/export`, {
+      params: month ? { month } : {},
+      responseType: "blob",
+    }),
 
   createWorkshop: (data) => api.post("/admin/workshops", data).then((r) => r.data),
   getWorkshops: () => api.get("/admin/workshops").then((r) => r.data),
@@ -47,6 +50,10 @@ export const adminService = {
 
   createBatch: (data) => api.post("/admin/batches", data).then((r) => r.data),
   getBatches: () => api.get("/admin/batches").then((r) => r.data),
+  getBatchEligibleStudents: (id) =>
+    api.get(`/admin/batches/${id}/eligible-students`).then((r) => r.data),
+  updateBatchStudents: (id, students) =>
+    api.put(`/admin/batches/${id}/students`, { students }).then((r) => r.data),
   updateBatch: (id, data) => api.put(`/admin/batches/${id}`, data).then((r) => r.data),
   deleteBatch: (id) => api.delete(`/admin/batches/${id}`).then((r) => r.data),
 

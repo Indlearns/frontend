@@ -285,6 +285,12 @@ const CoursesPage = () => {
                   <p className="text-sm text-slate-500 line-clamp-2">{c.description}</p>
                   <p className="text-sm text-brand-600 font-medium mt-1">
                     {formatPrice(c.price, c.currency)}
+                    {typeof c.enrollmentCount === "number" && (
+                      <span className="text-slate-600 font-normal">
+                        {" "}
+                        · {c.enrollmentCount} enrolled
+                      </span>
+                    )}
                   </p>
                   <div className="flex flex-wrap gap-2 mt-1">
                     <span className="text-xs px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 capitalize">

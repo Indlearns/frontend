@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { FiUsers } from "react-icons/fi";
 import { adminService } from "../../services/adminService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
@@ -26,6 +27,13 @@ const BatchesPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [studentsBatchId, setStudentsBatchId] = useState(null);
+  const [eligibleStudents, setEligibleStudents] = useState([]);
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsSaving, setStudentsSaving] = useState(false);
+  const [studentsError, setStudentsError] = useState("");
+
   const workshopOptions = useMemo(
     () => workshops.filter((w) => (w.eventType || "workshop") !== "hackathon"),
     [workshops]
@@ -34,6 +42,8 @@ const BatchesPage = () => {
     () => workshops.filter((w) => w.eventType === "hackathon"),
     [workshops]
   );
+
+  const studentsBatch = batches.find((b) => b._id === studentsBatchId);
 
   const load = async () => {
     const [b, c, w, t] = await Promise.all([
@@ -119,9 +129,67 @@ const BatchesPage = () => {
     try {
       await adminService.deleteBatch(id);
       if (editingId === id) resetForm();
+      if (studentsBatchId === id) closeStudentsPanel();
       load();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete batch");
+    }
+  };
+
+  const closeStudentsPanel = () => {
+    setStudentsBatchId(null);
+    setEligibleStudents([]);
+    setSelectedStudentIds([]);
+    setStudentsError("");
+  };
+
+  const openStudentsPanel = async (batch) => {
+    setStudentsBatchId(batch._id);
+    setStudentsLoading(true);
+    setStudentsError("");
+    try {
+      const r = await adminService.getBatchEligibleStudents(batch._id);
+      if (r.success) {
+        setEligibleStudents(r.data);
+        setSelectedStudentIds(r.data.filter((s) => s.inBatch).map((s) => s._id));
+      } else {
+        setStudentsError("Could not load eligible students.");
+      }
+    } catch (err) {
+      setStudentsError(err.response?.data?.message || "Could not load eligible students.");
+    } finally {
+      setStudentsLoading(false);
+    }
+  };
+
+  const toggleStudent = (id) => {
+    setSelectedStudentIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllEligible = () => {
+    setSelectedStudentIds(eligibleStudents.map((s) => s._id));
+  };
+
+  const clearStudentSelection = () => {
+    setSelectedStudentIds([]);
+  };
+
+  const saveBatchStudents = async () => {
+    if (!studentsBatchId) return;
+    setStudentsSaving(true);
+    setStudentsError("");
+    try {
+      const r = await adminService.updateBatchStudents(studentsBatchId, selectedStudentIds);
+      if (r.success) {
+        closeStudentsPanel();
+        load();
+      }
+    } catch (err) {
+      setStudentsError(err.response?.data?.message || "Failed to save students.");
+    } finally {
+      setStudentsSaving(false);
     }
   };
 
@@ -136,7 +204,7 @@ const BatchesPage = () => {
     <div>
       <PageHeader
         title="Batches"
-        subtitle="Create a batch for a course, workshop, or hackathon — assign tutor and batch chat is auto-created."
+        subtitle="Create batches for courses, workshops, or hackathons. Assign a tutor, then manually add enrolled students to each batch."
       />
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
@@ -171,6 +239,7 @@ const BatchesPage = () => {
               {courses.map((c) => (
                 <option key={c._id} value={c._id}>
                   {c.title}
+                  {c.enrollmentCount != null ? ` (${c.enrollmentCount} enrolled)` : ""}
                 </option>
               ))}
             </select>
@@ -245,7 +314,7 @@ const BatchesPage = () => {
               <li
                 key={b._id}
                 className={`p-4 rounded-xl border flex gap-3 ${
-                  editingId === b._id
+                  editingId === b._id || studentsBatchId === b._id
                     ? "border-brand-500 bg-brand-50/50 dark:bg-brand-950/20"
                     : "border-brand-100 dark:border-brand-800"
                 }`}
@@ -263,6 +332,15 @@ const BatchesPage = () => {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 h-fit shrink-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      studentsBatchId === b._id ? closeStudentsPanel() : openStudentsPanel(b)
+                    }
+                    className="text-emerald-600 text-sm hover:underline"
+                  >
+                    {studentsBatchId === b._id ? "Close" : "Students"}
+                  </button>
                   <button
                     type="button"
                     onClick={() => startEdit(b)}
@@ -286,6 +364,71 @@ const BatchesPage = () => {
           </ul>
         </div>
       </div>
+
+      {studentsBatchId && (
+        <div className="glass-card p-6 mt-8">
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div>
+              <h2 className="font-bold text-lg flex items-center gap-2">
+                <FiUsers className="text-brand-600" />
+                Add students — {studentsBatch?.name}
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Only students enrolled in {getBatchItemTitle(studentsBatch) || "this program"} can
+                be added. Students are not added automatically on enrollment.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={selectAllEligible}>
+                Select all
+              </Button>
+              <Button type="button" variant="outline" onClick={clearStudentSelection}>
+                Clear
+              </Button>
+              <Button
+                type="button"
+                disabled={studentsSaving || studentsLoading}
+                onClick={saveBatchStudents}
+              >
+                {studentsSaving ? "Saving..." : `Save (${selectedStudentIds.length})`}
+              </Button>
+              <Button type="button" variant="outline" onClick={closeStudentsPanel}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+
+          {studentsError && <p className="text-sm text-red-600 mb-3">{studentsError}</p>}
+          {studentsLoading && <p className="text-sm text-slate-500">Loading eligible students...</p>}
+
+          {!studentsLoading && eligibleStudents.length === 0 && (
+            <p className="text-sm text-slate-500">
+              No enrolled students found for this batch&apos;s course or workshop yet.
+            </p>
+          )}
+
+          {!studentsLoading && eligibleStudents.length > 0 && (
+            <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[400px] overflow-y-auto">
+              {eligibleStudents.map((s) => (
+                <li key={s._id}>
+                  <label className="flex items-start gap-2 p-3 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <input
+                      type="checkbox"
+                      checked={selectedStudentIds.includes(s._id)}
+                      onChange={() => toggleStudent(s._id)}
+                      className="mt-1"
+                    />
+                    <span className="min-w-0">
+                      <span className="block font-medium truncate">{s.name || "—"}</span>
+                      <span className="block text-xs text-slate-500 truncate">{s.email}</span>
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 };
