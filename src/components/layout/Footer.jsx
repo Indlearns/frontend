@@ -2,6 +2,10 @@ import { Link } from "react-router-dom";
 import { FiLinkedin, FiMail, FiPhone, FiInstagram, FiMapPin } from "react-icons/fi";
 import Logo from "../common/Logo";
 import { APP_NAME, CONTACT, SOCIAL_LINKS } from "../../utils/constants";
+import {
+  filterPublicNavLinks,
+  usePublicEventAvailability,
+} from "../../hooks/usePublicEventAvailability";
 
 const socialIcon = {
   linkedin: FiLinkedin,
@@ -12,14 +16,29 @@ const socialIcon = {
  * Site footer - links, contact, social icons, copyright
  */
 const Footer = () => {
+  const { hasWorkshops, hasHackathons, loading: eventsLoading } = usePublicEventAvailability();
+
+  const platformLinks = eventsLoading
+    ? [
+        { label: "Courses", path: "/courses" },
+        { label: "Workshops", path: "/workshops" },
+        { label: "Hackathons", path: "/events" },
+        { label: "Jobs", path: "/jobs" },
+        { label: "Mentorship", path: "/mentorship" },
+      ]
+    : filterPublicNavLinks(
+        [
+          { label: "Courses", path: "/courses" },
+          { label: "Workshops", path: "/workshops" },
+          { label: "Hackathons", path: "/events" },
+          { label: "Jobs", path: "/jobs" },
+          { label: "Mentorship", path: "/mentorship" },
+        ],
+        { hasWorkshops, hasHackathons }
+      );
+
   const footerLinks = {
-    Platform: [
-      { label: "Courses", path: "/courses" },
-      { label: "Workshops", path: "/workshops" },
-      { label: "Hackathons", path: "/events" },
-      { label: "Jobs", path: "/jobs" },
-      { label: "Mentorship", path: "/mentorship" },
-    ],
+    Platform: platformLinks,
     Company: [
       { label: "About Us", path: "/about" },
       { label: "Contact Us", path: "/contact" },

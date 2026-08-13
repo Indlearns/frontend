@@ -1,19 +1,30 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { publicService } from "../../services/publicService";
-import { WorkshopCard, EmptyState } from "../../components/public/ContentCards";
+import { WorkshopCard } from "../../components/public/ContentCards";
 import { isHackathonEvent } from "../../utils/eventPaths";
+import { loadPublicEventAvailability } from "../../hooks/usePublicEventAvailability";
 
 const WorkshopsPage = () => {
   const [workshops, setWorkshops] = useState([]);
+  const [hasHackathons, setHasHackathons] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    publicService.getWorkshops("workshop").then((r) => {
-        if (r.success) setWorkshops(r.data.filter((w) => !isHackathonEvent(w)));
-      })
-      .finally(() => setLoading(false));
+    Promise.all([
+      publicService.getWorkshops("workshop"),
+      loadPublicEventAvailability(),
+    ]).then(([workshopRes, availability]) => {
+      if (workshopRes.success) {
+        setWorkshops(workshopRes.data.filter((w) => !isHackathonEvent(w)));
+      }
+      setHasHackathons(availability.hasHackathons);
+    }).finally(() => setLoading(false));
   }, []);
+
+  if (!loading && !workshops.length) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="section-container py-12">
@@ -27,19 +38,15 @@ const WorkshopsPage = () => {
         {loading && <p className="text-slate-500 col-span-full">Loading...</p>}
         {!loading &&
           workshops.map((w) => <WorkshopCard key={w._id} workshop={w} />)}
-        {!loading && !workshops.length && (
-          <EmptyState
-            title="No upcoming workshops"
-            hint="We are scheduling new workshops. Please check back soon."
-          />
-        )}
       </div>
-      <p className="text-center mt-10 text-sm text-slate-500">
-        Looking for hackathons?{" "}
-        <Link to="/events" className="text-brand-600 hover:underline">
-          View hackathons →
-        </Link>
-      </p>
+      {hasHackathons && (
+        <p className="text-center mt-10 text-sm text-slate-500">
+          Looking for hackathons?{" "}
+          <Link to="/events" className="text-brand-600 hover:underline">
+            View hackathons →
+          </Link>
+        </p>
+      )}
     </div>
   );
 };

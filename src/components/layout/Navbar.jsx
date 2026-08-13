@@ -8,13 +8,21 @@ import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "../../contexts/AuthContext";
 import { NAV_LINKS, ENROLLED_STUDENT_NAV } from "../../utils/constants";
 import { useStudentEnrollment } from "../../hooks/useStudentEnrollment";
+import {
+  filterPublicNavLinks,
+  usePublicEventAvailability,
+} from "../../hooks/usePublicEventAvailability";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const { enrolled, isStudent } = useStudentEnrollment();
+  const { hasWorkshops, hasHackathons, loading: eventsLoading } = usePublicEventAvailability();
 
-  const navLinks = isStudent && enrolled ? ENROLLED_STUDENT_NAV : NAV_LINKS;
+  const baseNavLinks = isStudent && enrolled ? ENROLLED_STUDENT_NAV : NAV_LINKS;
+  const navLinks = eventsLoading
+    ? baseNavLinks
+    : filterPublicNavLinks(baseNavLinks, { hasWorkshops, hasHackathons });
 
   const navLinkClass = ({ isActive }) =>
     `text-sm font-medium transition-colors ${

@@ -94,7 +94,7 @@ const LearnersWorkAtMarquee = ({
   title = "Our Learners Work At",
   subtitle = "Graduates from IndLearn programs are building careers at leading companies worldwide.",
 }) => (
-  <section className="py-16 lg:py-20 overflow-hidden bg-white dark:bg-[#0A1628]">
+  <section className="py-16 lg:py-20 overflow-hidden bg-slate-50/80 dark:bg-slate-900/30">
     <div className="section-container mb-10 lg:mb-12">
       <h2 className="section-title text-center text-slate-900 dark:text-white">{title}</h2>
       {subtitle && (
