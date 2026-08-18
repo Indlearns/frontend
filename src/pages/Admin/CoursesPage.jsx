@@ -4,7 +4,7 @@ import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
 import CourseEnrollmentsPanel from "../../components/admin/CourseEnrollmentsPanel";
 import DescriptionEditor from "../../components/admin/DescriptionEditor";
-import { stripDescriptionMarkup } from "../../utils/descriptionFormat";
+import { stripDescriptionMarkup, isRichTextEmpty } from "../../utils/descriptionFormat";
 import {
   getImageUrl,
   formatPrice,
@@ -105,6 +105,10 @@ const CoursesPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (isRichTextEmpty(form.description)) {
+      setError("Description is required.");
+      return;
+    }
     setLoading(true);
     try {
       const r = editingId

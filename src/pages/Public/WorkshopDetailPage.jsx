@@ -12,7 +12,7 @@ import {
   isRegistrationClosed,
 } from "../../utils/media";
 import { resolveWorkshopPurchaseType } from "../../utils/purchaseFlow";
-import FormattedDescription from "../../components/common/FormattedDescription";
+import RichDescription from "../../components/common/RichDescription";
 
 const WorkshopDetailContent = ({ workshop, onReload }) => {
   const purchaseType = resolveWorkshopPurchaseType(workshop);
@@ -67,7 +67,7 @@ const WorkshopDetailContent = ({ workshop, onReload }) => {
 
       {workshop.description && (
         <div className="mt-6">
-          <FormattedDescription text={workshop.description} />
+          <RichDescription text={workshop.description} />
         </div>
       )}
 

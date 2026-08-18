@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { studentService } from "../../services/studentService";
 import Button from "../../components/common/Button";
 import { FiBookOpen, FiCalendar, FiMessageCircle, FiVideo } from "react-icons/fi";
-import FormattedDescription from "../../components/common/FormattedDescription";
+import RichDescription from "../../components/common/RichDescription";
 
 const StudentCourseDashboardPage = () => {
   const { batchId } = useParams();
@@ -30,7 +30,7 @@ const StudentCourseDashboardPage = () => {
       <p className="text-brand-600 text-sm">{batch.name}</p>
       {(batch.course?.description || batch.workshop?.description) && (
         <div className="mt-3 max-w-2xl">
-          <FormattedDescription
+          <RichDescription
             text={batch.course?.description || batch.workshop?.description}
           />
         </div>

@@ -12,7 +12,7 @@ import {
   formatEnrollmentCloseDate,
   isEnrollmentClosed,
 } from "../../utils/media";
-import FormattedDescription from "../../components/common/FormattedDescription";
+import RichDescription from "../../components/common/RichDescription";
 
 const CourseDetailContent = ({ course, onReload }) => {
   const purchase = usePurchase({
@@ -66,7 +66,7 @@ const CourseDetailContent = ({ course, onReload }) => {
 
       {course.description && (
         <div className="mt-6">
-          <FormattedDescription text={course.description} />
+          <RichDescription text={course.description} />
         </div>
       )}
 

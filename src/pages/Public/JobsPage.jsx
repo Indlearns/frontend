@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FiExternalLink, FiMapPin } from "react-icons/fi";
 import { publicService } from "../../services/publicService";
+import RichDescription from "../../components/common/RichDescription";
 import { EmptyState } from "../../components/public/ContentCards";
 
 const jobTypeLabel = {
@@ -57,9 +58,9 @@ const PublicJobsPage = () => {
               )}
 
               {job.description && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-3 whitespace-pre-line">
-                  {job.description}
-                </p>
+                <div className="mt-3">
+                  <RichDescription text={job.description} className="text-sm" />
+                </div>
               )}
 
               {job.skills?.length > 0 && (

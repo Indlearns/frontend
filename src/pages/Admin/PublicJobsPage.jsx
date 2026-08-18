@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
+import DescriptionEditor from "../../components/admin/DescriptionEditor";
 
 const emptyForm = {
   title: "",
@@ -119,11 +120,11 @@ const PublicJobsPage = () => {
             onChange={(e) => setForm({ ...form, company: e.target.value })}
             className="input-field"
           />
-          <textarea
-            placeholder="Job description"
+          <DescriptionEditor
+            label="Job description"
             value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="input-field min-h-[120px]"
+            onChange={(description) => setForm({ ...form, description })}
+            minHeight="180px"
           />
           <input
             placeholder="Location"

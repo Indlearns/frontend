@@ -108,4 +108,97 @@
       overflow: visible;
     }
   }
+
+  /* Rich text editor (TipTap) — same font as site */
+  .tiptap-editor {
+    @apply text-slate-800 dark:text-slate-200 font-sans;
+  }
+
+  .tiptap-editor p.is-editor-empty:first-child::before {
+    @apply text-slate-400;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .tiptap-editor h2 {
+    @apply text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-4 mb-2 first:mt-0;
+  }
+
+  .tiptap-editor h3 {
+    @apply text-lg font-semibold text-slate-900 dark:text-white mt-3 mb-1 first:mt-0;
+  }
+
+  .tiptap-editor ul,
+  .tiptap-editor ol {
+    @apply pl-5 space-y-1 my-2;
+  }
+
+  .tiptap-editor ul {
+    list-style-type: disc;
+  }
+
+  .tiptap-editor ul[data-list-style="circle"] {
+    list-style-type: circle;
+  }
+
+  .tiptap-editor ul[data-list-style="square"] {
+    list-style-type: square;
+  }
+
+  .tiptap-editor ol {
+    list-style-type: decimal;
+  }
+
+  .tiptap-editor p {
+    @apply leading-relaxed;
+  }
+
+  /* Public rendered descriptions */
+  .rich-description h2 {
+    @apply text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-3 first:mt-0;
+  }
+
+  .rich-description h3 {
+    @apply text-lg font-semibold text-slate-900 dark:text-white mt-6 mb-2 first:mt-0;
+  }
+
+  .rich-description p {
+    @apply text-slate-700 dark:text-slate-300 leading-relaxed;
+  }
+
+  .rich-description ul,
+  .rich-description ol {
+    @apply pl-5 space-y-2 text-slate-700 dark:text-slate-300 my-2;
+  }
+
+  .rich-description ul {
+    list-style-type: disc;
+  }
+
+  .rich-description ul[data-list-style="circle"] {
+    list-style-type: circle;
+  }
+
+  .rich-description ul[data-list-style="square"] {
+    list-style-type: square;
+  }
+
+  .rich-description ol {
+    list-style-type: decimal;
+  }
+
+  .rich-description li {
+    @apply leading-relaxed;
+  }
+
+  .rich-description strong,
+  .rich-description b {
+    @apply font-semibold text-slate-900 dark:text-white;
+  }
+
+  .rich-description a {
+    @apply text-brand-600 hover:underline;
+  }
 }

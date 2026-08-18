@@ -16,7 +16,7 @@ import {
   isRegistrationClosed,
 } from "../../utils/media";
 import { getPurchaseType } from "../../utils/purchaseFlow";
-import FormattedDescription from "../../components/common/FormattedDescription";
+import RichDescription from "../../components/common/RichDescription";
 
 import { hasValidPaymentPhone, normalizeIndianPhone } from "../../utils/zohoPaymentFormat";
 
@@ -182,7 +182,7 @@ const CheckoutContent = ({ purchaseType, item, onComplete }) => {
         </div>
         {item.description && (
           <div className="mt-4 max-h-48 overflow-y-auto">
-            <FormattedDescription text={item.description} className="text-sm" />
+            <RichDescription text={item.description} className="text-sm" />
           </div>
         )}
       </div>
