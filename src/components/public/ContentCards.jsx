@@ -9,6 +9,7 @@ import {
   isRegistrationClosed,
 } from "../../utils/media";
 import { getEventDetailPath, isHackathonEvent } from "../../utils/eventPaths";
+import { stripDescriptionMarkup } from "../../utils/descriptionFormat";
 
 export const CourseCard = ({ course, compact }) => {
   const closed = isEnrollmentClosed(course);
@@ -52,7 +53,7 @@ export const CourseCard = ({ course, compact }) => {
           </h3>
           {!compact && course.description && (
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">
-              {course.description}
+              {stripDescriptionMarkup(course.description)}
             </p>
           )}
           <p className="text-xs text-slate-500 mt-3 flex items-center gap-1">
@@ -112,7 +113,7 @@ export const WorkshopCard = ({ workshop, compact }) => (
     )}
     {!compact && workshop.description && (
       <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">
-        {workshop.description}
+        {stripDescriptionMarkup(workshop.description)}
       </p>
     )}
     <p className="text-xs text-slate-500 mt-3">

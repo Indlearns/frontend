@@ -3,6 +3,8 @@ import { adminService } from "../../services/adminService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
 import CourseEnrollmentsPanel from "../../components/admin/CourseEnrollmentsPanel";
+import DescriptionEditor from "../../components/admin/DescriptionEditor";
+import { stripDescriptionMarkup } from "../../utils/descriptionFormat";
 import {
   getImageUrl,
   formatPrice,
@@ -181,12 +183,12 @@ const CoursesPage = () => {
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             className="input-field"
           />
-          <textarea
+          <DescriptionEditor
+            label="Description"
             required
-            placeholder="Description — use headings (# Title or Title:), bullets (- item), numbered lists (1. item)"
             value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="input-field min-h-[100px]"
+            onChange={(description) => setForm({ ...form, description })}
+            minRows={10}
           />
           <input
             placeholder="Category (e.g. Web Development)"
@@ -282,7 +284,9 @@ const CoursesPage = () => {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold">{c.title}</p>
-                  <p className="text-sm text-slate-500 line-clamp-2">{c.description}</p>
+                  <p className="text-sm text-slate-500 line-clamp-2">
+                    {stripDescriptionMarkup(c.description)}
+                  </p>
                   <p className="text-sm text-brand-600 font-medium mt-1">
                     {formatPrice(c.price, c.currency)}
                     {typeof c.enrollmentCount === "number" && (

@@ -1,18 +1,36 @@
 import { useMemo } from "react";
 
-/** Inline **bold** segments */
+/** Inline **bold** and *italic* segments */
 const formatInline = (text) => {
-  const parts = String(text).split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return (
-        <strong key={i} className="font-semibold text-slate-900 dark:text-white">
-          {part.slice(2, -2)}
+  const segments = [];
+  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match;
+
+  const pushText = (chunk, key) => {
+    if (chunk) segments.push(<span key={key}>{chunk}</span>);
+  };
+
+  while ((match = pattern.exec(text)) !== null) {
+    pushText(text.slice(lastIndex, match.index), `${lastIndex}-t`);
+    const token = match[0];
+    if (token.startsWith("**")) {
+      segments.push(
+        <strong key={match.index} className="font-semibold text-slate-900 dark:text-white">
+          {token.slice(2, -2)}
         </strong>
       );
+    } else {
+      segments.push(
+        <em key={match.index} className="italic">
+          {token.slice(1, -1)}
+        </em>
+      );
     }
-    return part;
-  });
+    lastIndex = match.index + token.length;
+  }
+  pushText(text.slice(lastIndex), `${lastIndex}-end`);
+  return segments.length ? segments : text;
 };
 
 const isHeadingLine = (line) => {

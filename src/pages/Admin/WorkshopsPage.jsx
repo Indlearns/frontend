@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { adminService } from "../../services/adminService";
 import Button from "../../components/common/Button";
 import PageHeader from "../../components/admin/PageHeader";
+import DescriptionEditor from "../../components/admin/DescriptionEditor";
 import { isHackathonEvent } from "../../utils/eventPaths";
 import { isPubliclyVisibleWorkshop } from "../../utils/workshopVisibility";
 import {
@@ -141,11 +142,11 @@ const WorkshopsPage = () => {
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             className="input-field"
           />
-          <textarea
-            placeholder="Description"
+          <DescriptionEditor
+            label="Description"
             value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="input-field min-h-[80px]"
+            onChange={(description) => setForm({ ...form, description })}
+            minRows={8}
           />
           <select
             value={form.eventType}
