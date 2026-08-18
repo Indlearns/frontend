@@ -1,0 +1,22 @@
+# IndLearn — robots.txt
+User-agent: *
+Allow: /
+
+# Private / authenticated areas
+Disallow: /admin
+Disallow: /admins/
+Disallow: /superadmin
+Disallow: /student
+Disallow: /tutor
+Disallow: /partner
+
+# Checkout & payment callbacks
+Disallow: /checkout
+Disallow: /payment/
+Disallow: /zoho/
+
+# Auth recovery
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://indlearns.com/sitemap.xml
