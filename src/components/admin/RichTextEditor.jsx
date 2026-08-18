@@ -70,12 +70,17 @@ const ToolbarDivider = () => (
   <span className="w-px h-6 bg-brand-200 dark:bg-brand-700 mx-0.5 self-center" />
 );
 
-/** Apply heading only to the line(s) touched by the selection — not the whole document */
+/** Apply or remove heading on the current line / selection */
 const applyHeadingLevel = (editor, level) => {
+  if (editor.isActive("heading", { level })) {
+    editor.chain().focus().setParagraph().run();
+    return;
+  }
+
   const { from, to, empty } = editor.state.selection;
 
   if (empty) {
-    editor.chain().focus().toggleHeading({ level }).run();
+    editor.chain().focus().setHeading({ level }).run();
     return;
   }
 
@@ -102,12 +107,15 @@ const applyHeadingLevel = (editor, level) => {
 };
 
 const applyBodyText = (editor) => {
-  const { empty } = editor.state.selection;
-  if (empty) {
-    editor.chain().focus().setParagraph().run();
+  editor.chain().focus().setParagraph().run();
+};
+
+const toggleAlign = (editor, align) => {
+  if (editor.isActive({ textAlign: align })) {
+    editor.chain().focus().setTextAlign("left").run();
     return;
   }
-  editor.chain().focus().clearNodes().run();
+  editor.chain().focus().setTextAlign(align).run();
 };
 
 const EditorToolbar = ({ editor, onEmojiOpen }) => {
@@ -119,6 +127,10 @@ const EditorToolbar = ({ editor, onEmojiOpen }) => {
     if (editor.isActive("orderedList")) {
       editor.chain().focus().toggleOrderedList().run();
     }
+    if (editor.isActive("bulletList") && bulletStyle === style) {
+      editor.chain().focus().toggleBulletList().run();
+      return;
+    }
     if (editor.isActive("bulletList")) {
       editor.chain().focus().updateAttributes("bulletList", { listStyleType: style }).run();
       return;
@@ -129,21 +141,21 @@ const EditorToolbar = ({ editor, onEmojiOpen }) => {
   return (
     <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-brand-100 dark:border-brand-800 bg-slate-50/80 dark:bg-slate-800/50">
       <ToolbarButton
-        title="Bold"
+        title="Bold (click again to remove)"
         active={editor.isActive("bold")}
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
         <FiBold size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Italic"
+        title="Italic (click again to remove)"
         active={editor.isActive("italic")}
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
         <FiItalic size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Underline"
+        title="Underline (click again to remove)"
         active={editor.isActive("underline")}
         onClick={() => editor.chain().focus().toggleUnderline().run()}
       >
@@ -153,14 +165,14 @@ const EditorToolbar = ({ editor, onEmojiOpen }) => {
       <ToolbarDivider />
 
       <ToolbarButton
-        title="Heading — applies to the current line (click again to remove)"
+        title="Heading (click again to remove)"
         active={editor.isActive("heading", { level: 2 })}
         onClick={() => applyHeadingLevel(editor, 2)}
       >
         <FiHash size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Subheading — applies to the current line (click again to remove)"
+        title="Subheading (click again to remove)"
         active={editor.isActive("heading", { level: 3 })}
         onClick={() => applyHeadingLevel(editor, 3)}
       >
@@ -177,28 +189,28 @@ const EditorToolbar = ({ editor, onEmojiOpen }) => {
       <ToolbarDivider />
 
       <ToolbarButton
-        title="Bullet list (disc)"
+        title="Bullet list — disc (click again to remove)"
         active={editor.isActive("bulletList") && bulletStyle === "disc"}
         onClick={() => setBulletList("disc")}
       >
         <FiList size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Bullet list (circle)"
+        title="Bullet list — circle (click again to remove)"
         active={editor.isActive("bulletList") && bulletStyle === "circle"}
         onClick={() => setBulletList("circle")}
       >
         <span className="text-base leading-none">○</span>
       </ToolbarButton>
       <ToolbarButton
-        title="Bullet list (square)"
+        title="Bullet list — square (click again to remove)"
         active={editor.isActive("bulletList") && bulletStyle === "square"}
         onClick={() => setBulletList("square")}
       >
         <span className="text-xs leading-none">■</span>
       </ToolbarButton>
       <ToolbarButton
-        title="Numbered list"
+        title="Numbered list (click again to remove)"
         active={editor.isActive("orderedList")}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
@@ -208,30 +220,30 @@ const EditorToolbar = ({ editor, onEmojiOpen }) => {
       <ToolbarDivider />
 
       <ToolbarButton
-        title="Align left"
+        title="Align left (click again to reset)"
         active={editor.isActive({ textAlign: "left" })}
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        onClick={() => toggleAlign(editor, "left")}
       >
         <FiAlignLeft size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Align center"
+        title="Align center (click again to reset)"
         active={editor.isActive({ textAlign: "center" })}
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        onClick={() => toggleAlign(editor, "center")}
       >
         <FiAlignCenter size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Align right"
+        title="Align right (click again to reset)"
         active={editor.isActive({ textAlign: "right" })}
-        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        onClick={() => toggleAlign(editor, "right")}
       >
         <FiAlignRight size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Justify"
+        title="Justify (click again to reset)"
         active={editor.isActive({ textAlign: "justify" })}
-        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+        onClick={() => toggleAlign(editor, "justify")}
       >
         <FiAlignJustify size={16} />
       </ToolbarButton>
@@ -261,6 +273,7 @@ const RichTextEditor = ({
   showPreview = true,
 }) => {
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [, setToolbarTick] = useState(0);
   const emojiRef = useRef(null);
   const lastHtml = useRef(value || "");
 
@@ -288,6 +301,17 @@ const RichTextEditor = ({
       onChange(html);
     },
   });
+
+  useEffect(() => {
+    if (!editor) return undefined;
+    const refreshToolbar = () => setToolbarTick((n) => n + 1);
+    editor.on("selectionUpdate", refreshToolbar);
+    editor.on("transaction", refreshToolbar);
+    return () => {
+      editor.off("selectionUpdate", refreshToolbar);
+      editor.off("transaction", refreshToolbar);
+    };
+  }, [editor]);
 
   useEffect(() => {
     if (!editor) return;
@@ -347,8 +371,8 @@ const RichTextEditor = ({
       </div>
 
       <p className="text-xs text-slate-500">
-        Tip: press <strong>Enter</strong> to start a new line. Headings apply to the line where your
-        cursor is, or only the text you selected. Use <strong>Text</strong> to remove a heading.
+        Tip: press <strong>Enter</strong> for a new line. Click any active format button again to
+        remove that formatting. Use <strong>Text</strong> for normal body text.
       </p>
 
       {required && empty && (
