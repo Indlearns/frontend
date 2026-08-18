@@ -54,6 +54,7 @@ const ToolbarButton = ({ title, onClick, active, disabled, children }) => (
     type="button"
     title={title}
     disabled={disabled}
+    onMouseDown={(e) => e.preventDefault()}
     onClick={onClick}
     className={`p-2 rounded-lg text-sm transition-colors disabled:opacity-40 ${
       active
@@ -68,6 +69,46 @@ const ToolbarButton = ({ title, onClick, active, disabled, children }) => (
 const ToolbarDivider = () => (
   <span className="w-px h-6 bg-brand-200 dark:bg-brand-700 mx-0.5 self-center" />
 );
+
+/** Apply heading only to the line(s) touched by the selection — not the whole document */
+const applyHeadingLevel = (editor, level) => {
+  const { from, to, empty } = editor.state.selection;
+
+  if (empty) {
+    editor.chain().focus().toggleHeading({ level }).run();
+    return;
+  }
+
+  const $from = editor.state.doc.resolve(from);
+  const $to = editor.state.doc.resolve(to);
+  const sameParagraph =
+    $from.parent === $to.parent &&
+    ($from.parent.type.name === "paragraph" || $from.parent.type.name === "heading");
+
+  if (sameParagraph && (from > $from.start() || to < $from.end())) {
+    editor
+      .chain()
+      .focus()
+      .setTextSelection(to)
+      .splitBlock()
+      .setTextSelection(from)
+      .splitBlock()
+      .setHeading({ level })
+      .run();
+    return;
+  }
+
+  editor.chain().focus().setHeading({ level }).run();
+};
+
+const applyBodyText = (editor) => {
+  const { empty } = editor.state.selection;
+  if (empty) {
+    editor.chain().focus().setParagraph().run();
+    return;
+  }
+  editor.chain().focus().clearNodes().run();
+};
 
 const EditorToolbar = ({ editor, onEmojiOpen }) => {
   if (!editor) return null;
@@ -112,25 +153,25 @@ const EditorToolbar = ({ editor, onEmojiOpen }) => {
       <ToolbarDivider />
 
       <ToolbarButton
-        title="Heading"
+        title="Heading — applies to the current line (click again to remove)"
         active={editor.isActive("heading", { level: 2 })}
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        onClick={() => applyHeadingLevel(editor, 2)}
       >
         <FiHash size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Subheading"
+        title="Subheading — applies to the current line (click again to remove)"
         active={editor.isActive("heading", { level: 3 })}
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        onClick={() => applyHeadingLevel(editor, 3)}
       >
         <FiType size={16} />
       </ToolbarButton>
       <ToolbarButton
-        title="Normal paragraph"
-        active={editor.isActive("paragraph")}
-        onClick={() => editor.chain().focus().setParagraph().run()}
+        title="Normal text — turn heading back into regular paragraph"
+        active={editor.isActive("paragraph") && !editor.isActive("heading")}
+        onClick={() => applyBodyText(editor)}
       >
-        <span className="text-xs font-medium px-0.5">P</span>
+        <span className="text-[10px] font-semibold px-0.5 leading-none">Text</span>
       </ToolbarButton>
 
       <ToolbarDivider />
@@ -304,6 +345,11 @@ const RichTextEditor = ({
           </div>
         )}
       </div>
+
+      <p className="text-xs text-slate-500">
+        Tip: press <strong>Enter</strong> to start a new line. Headings apply to the line where your
+        cursor is, or only the text you selected. Use <strong>Text</strong> to remove a heading.
+      </p>
 
       {required && empty && (
         <p className="text-xs text-amber-600">Description is required.</p>
