@@ -26,6 +26,10 @@ const JobListingCard = ({ job }) => {
             </span>
           </div>
 
+          {job.company && (
+            <p className="text-brand-600 font-medium text-sm mt-1">{job.company}</p>
+          )}
+
           {job.location && (
             <p className="text-sm text-slate-500 mt-2 flex items-center gap-1.5">
               <FiMapPin size={14} className="shrink-0" />
@@ -70,12 +74,6 @@ const JobListingCard = ({ job }) => {
 
       {expanded && hasDetails && (
         <div className="mt-5 pt-5 border-t border-brand-100 dark:border-brand-800 space-y-4">
-          {job.company && (
-            <p className="text-sm">
-              <span className="text-slate-500">Company: </span>
-              <span className="font-medium text-brand-600">{job.company}</span>
-            </p>
-          )}
           {job.description && (
             <div className="max-h-[480px] overflow-y-auto pr-1">
               <RichDescription text={job.description} className="text-sm" />
