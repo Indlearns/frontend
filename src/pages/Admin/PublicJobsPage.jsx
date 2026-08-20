@@ -91,7 +91,7 @@ const PublicJobsPage = () => {
     <div>
       <PageHeader
         title="Public Jobs"
-        subtitle="Post job openings visible on the public website. Anyone can view and apply via the apply link — no login required."
+        subtitle="Post job openings visible on the public website for 10 days, then they are removed automatically. Anyone can view and apply via the apply link — no login required."
       />
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -202,6 +202,9 @@ const PublicJobsPage = () => {
                 </div>
                 <p className="text-xs text-slate-500 mt-1 capitalize">
                   {job.jobType} · {job.location}
+                  {typeof job.daysRemaining === "number" && (
+                    <> · {job.daysRemaining === 0 ? "Expires today" : `${job.daysRemaining} day${job.daysRemaining === 1 ? "" : "s"} left`}</>
+                  )}
                 </p>
                 {job.applyLink && (
                   <a
