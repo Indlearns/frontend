@@ -1,6 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AffiliateAuthProvider } from "./contexts/AffiliateAuthContext";
+import AffiliateCapture from "./components/affiliate/AffiliateCapture";
 import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
 import AppRoutes from "./routes/AppRoutes";
 
@@ -12,10 +14,13 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <GoogleAnalytics />
-          <AppRoutes />
-        </BrowserRouter>
+        <AffiliateAuthProvider>
+          <BrowserRouter>
+            <GoogleAnalytics />
+            <AffiliateCapture />
+            <AppRoutes />
+          </BrowserRouter>
+        </AffiliateAuthProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -42,6 +42,7 @@ import TutorShowcasePage from "../pages/Admin/TutorShowcasePage";
 import ChatPage from "../pages/Admin/ChatPage";
 import LiveClassesPage from "../pages/Admin/LiveClassesPage";
 import StaffAdminsPage from "../pages/Admin/StaffAdminsPage";
+import AffiliatesPage from "../pages/Admin/AffiliatesPage";
 import CoursesPage from "../pages/Public/CoursesPage";
 import CheckoutPage from "../pages/Public/CheckoutPage";
 import CourseDetailPage from "../pages/Public/CourseDetailPage";
@@ -49,6 +50,15 @@ import WorkshopsPage from "../pages/Public/WorkshopsPage";
 import WorkshopDetailPage from "../pages/Public/WorkshopDetailPage";
 import EventsPage from "../pages/Public/EventsPage";
 import JobsPage from "../pages/Public/JobsPage";
+import AffiliateProgramPage from "../pages/Public/AffiliateProgramPage";
+import AffiliateLoginPage from "../pages/Affiliate/AffiliateLoginPage";
+import AffiliateRegisterPage from "../pages/Affiliate/AffiliateRegisterPage";
+import AffiliateLayout from "../components/affiliate/layout/AffiliateLayout";
+import AffiliateDashboardPage from "../pages/Affiliate/AffiliateDashboardPage";
+import AffiliateProfilePage from "../pages/Affiliate/AffiliateProfilePage";
+import AffiliateLinksPage from "../pages/Affiliate/AffiliateLinksPage";
+import AffiliateEarningsPage from "../pages/Affiliate/AffiliateEarningsPage";
+import AffiliateProtectedRoute from "./AffiliateProtectedRoute";
 import MentorshipPage from "../pages/Public/MentorshipPage";
 import PrivacyPolicyPage from "../pages/Legal/PrivacyPolicyPage";
 import TermsPage from "../pages/Legal/TermsPage";
@@ -103,6 +113,7 @@ const AppRoutes = () => (
       <Route path="live-classes" element={<LiveClassesPage />} />
       <Route path="companies" element={<CompaniesPage />} />
       <Route path="public-jobs" element={<PublicJobsPage />} />
+      <Route path="affiliates" element={<AffiliatesPage />} />
       <Route path="chat" element={<ChatPage />} />
       <Route path="staff-admins" element={<StaffAdminsPage />} />
     </Route>
@@ -148,6 +159,22 @@ const AppRoutes = () => (
       <Route path="meetings" element={<StudentMeetingsPage />} />
     </Route>
 
+    <Route path="affiliate/login" element={<AffiliateLoginPage />} />
+    <Route path="affiliate/register" element={<AffiliateRegisterPage />} />
+    <Route
+      path="/affiliate"
+      element={
+        <AffiliateProtectedRoute>
+          <AffiliateLayout />
+        </AffiliateProtectedRoute>
+      }
+    >
+      <Route index element={<AffiliateDashboardPage />} />
+      <Route path="profile" element={<AffiliateProfilePage />} />
+      <Route path="links" element={<AffiliateLinksPage />} />
+      <Route path="earnings" element={<AffiliateEarningsPage />} />
+    </Route>
+
     <Route
       path="/partner"
       element={
@@ -178,6 +205,7 @@ const AppRoutes = () => (
       <Route path="events" element={<EventsPage />} />
       <Route path="events/:id" element={<WorkshopDetailPage />} />
       <Route path="jobs" element={<JobsPage />} />
+      <Route path="affiliate-program" element={<AffiliateProgramPage />} />
       <Route path="mentorship" element={<MentorshipPage />} />
       <Route path="privacy" element={<PrivacyPolicyPage />} />
       <Route path="terms" element={<TermsPage />} />

@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useStudentEnrollment } from "./useStudentEnrollment";
 import { isEnrollmentClosed, isRegistrationClosed, isFreePrice } from "../utils/media";
 import { getPurchaseType } from "../utils/purchaseFlow";
+import { getStoredAffiliateCode } from "../utils/affiliateTracking";
 
 const HOOK_CONFIG = {
   course: {
@@ -130,8 +131,12 @@ export const usePurchase = ({ purchaseType, item, onSuccess, referralCode }) => 
     payingRef.current = true;
 
     try {
-      const orderOpts = referralCode ? { referralCode } : undefined;
-      const orderRes = await cfg.createOrder(item._id, orderOpts);
+      const affiliateCode = getStoredAffiliateCode();
+      const orderOpts = {
+        ...(referralCode ? { referralCode } : {}),
+        ...(affiliateCode ? { affiliateCode } : {}),
+      };
+      const orderRes = await cfg.createOrder(item._id, Object.keys(orderOpts).length ? orderOpts : undefined);
 
       if (orderRes.data?.alreadyPurchased || orderRes.data?.alreadyRegistered) {
         await completeSuccess();

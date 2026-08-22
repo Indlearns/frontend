@@ -8,9 +8,9 @@ export const paymentService = {
   exchangeZohoCode: (code) =>
     api.post("/payments/zoho/exchange-code", { code }).then((r) => r.data),
 
-  createCourseOrder: (courseId, { referralCode } = {}) =>
+  createCourseOrder: (courseId, { referralCode, affiliateCode } = {}) =>
     api
-      .post(`/payments/course/${courseId}/create-order`, { referralCode })
+      .post(`/payments/course/${courseId}/create-order`, { referralCode, affiliateCode })
       .then((r) => r.data),
 
   validateCourseReferral: (courseId, referralCode) =>
@@ -18,9 +18,9 @@ export const paymentService = {
       .post(`/payments/course/${courseId}/validate-referral`, { referralCode })
       .then((r) => r.data),
 
-  createWorkshopOrder: (workshopId, { referralCode } = {}) =>
+  createWorkshopOrder: (workshopId, { referralCode, affiliateCode } = {}) =>
     api
-      .post(`/payments/workshop/${workshopId}/create-order`, { referralCode })
+      .post(`/payments/workshop/${workshopId}/create-order`, { referralCode, affiliateCode })
       .then((r) => r.data),
 
   validateReferral: (purchaseType, itemId, referralCode) => {

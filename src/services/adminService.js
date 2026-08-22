@@ -98,4 +98,12 @@ export const adminService = {
   getPublicJobs: () => api.get("/admin/public-jobs").then((r) => r.data),
   updatePublicJob: (id, data) => api.put(`/admin/public-jobs/${id}`, data).then((r) => r.data),
   deletePublicJob: (id) => api.delete(`/admin/public-jobs/${id}`).then((r) => r.data),
+
+  getAffiliates: () => api.get("/admin/affiliates").then((r) => r.data),
+  getAffiliate: (id) => api.get(`/admin/affiliates/${id}`).then((r) => r.data),
+  getAffiliateWithdrawals: (status) =>
+    api.get("/admin/affiliates/withdrawals", { params: status ? { status } : {} }).then((r) => r.data),
+  completeAffiliateWithdrawal: (id) =>
+    api.patch(`/admin/affiliates/withdrawals/${id}/complete`).then((r) => r.data),
+  toggleAffiliateActive: (id) => api.patch(`/admin/affiliates/${id}/toggle-active`).then((r) => r.data),
 };

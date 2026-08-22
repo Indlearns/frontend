@@ -7,6 +7,7 @@ export const ROLES = {
   TUTOR: "tutor",
   STUDENT: "student",
   PARTNER: "partner",
+  AFFILIATE: "affiliate",
 };
 
 export const SUPER_ADMIN_EMAIL = "official@indlearns.com";
@@ -39,6 +40,9 @@ export const SOCIAL_LINKS = [
 export const SUPERADMIN_LOGIN_PATH = "/superadmin/login";
 export const ADMIN_LOGIN_PATH = "/admins/login";
 export const PARTNER_LOGIN_PATH = "/partners/login";
+export const AFFILIATE_LOGIN_PATH = "/affiliate/login";
+export const AFFILIATE_REGISTER_PATH = "/affiliate/register";
+export const AFFILIATE_PROGRAM_PATH = "/affiliate-program";
 
 export const ROLE_LABELS = {
   superadmin: "Super Admin",
@@ -53,6 +57,7 @@ export const NAV_LINKS = [
   { label: "Workshops", path: "/workshops" },
   { label: "Hackathons", path: "/events" },
   { label: "Jobs", path: "/jobs" },
+  { label: "Affiliate", path: "/affiliate-program" },
   { label: "Mentorship", path: "/mentorship" },
 ];
 

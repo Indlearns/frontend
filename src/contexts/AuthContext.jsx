@@ -18,7 +18,12 @@ export const AuthProvider = ({ children }) => {
 
       if (token && savedUser) {
         try {
-          setUser(JSON.parse(savedUser));
+          const parsed = JSON.parse(savedUser);
+          if (parsed.role === "affiliate") {
+            setLoading(false);
+            return;
+          }
+          setUser(parsed);
           const res = await authService.getMe();
           if (res.success) {
             setUser(res.data);
