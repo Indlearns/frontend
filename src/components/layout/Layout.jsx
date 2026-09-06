@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import StudentEnrollBanner from "../student/StudentEnrollBanner";
+import PageTransition from "../common/PageTransition";
 
 /**
  * Main layout wrapper - Navbar + page content + Footer
@@ -13,7 +14,9 @@ const Layout = () => {
       <Navbar />
       <StudentEnrollBanner />
       <main className="flex-1">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
     </div>

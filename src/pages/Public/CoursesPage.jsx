@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { publicService } from "../../services/publicService";
 import { CourseCard, EmptyState } from "../../components/public/ContentCards";
 import { Link } from "react-router-dom";
+import ScrollReveal from "../../components/common/ScrollReveal";
+import { staggerContainer, staggerItem } from "../../utils/motion";
 
 const CoursesPage = () => {
   const [allCourses, setAllCourses] = useState([]);
@@ -25,7 +28,7 @@ const CoursesPage = () => {
 
   return (
     <div className="section-container py-12">
-      <div className="max-w-3xl mb-8">
+      <ScrollReveal className="max-w-3xl mb-8">
         <h1 className="font-display text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white">
           Courses
         </h1>
@@ -37,15 +40,15 @@ const CoursesPage = () => {
             Sign in as a student to purchase →
           </Link>
         </p>
-      </div>
+      </ScrollReveal>
 
       {categories.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <ScrollReveal delay={1} className="flex flex-wrap gap-2 mb-6">
           <button
             type="button"
             onClick={() => setCategory("")}
-            className={`px-4 py-2 rounded-xl text-sm ${
-              !category ? "bg-brand-500 text-white" : "bg-slate-100 dark:bg-slate-800"
+            className={`px-4 py-2 rounded-xl text-sm transition-all duration-300 ${
+              !category ? "bg-brand-500 text-white shadow-brand" : "bg-slate-100 dark:bg-slate-800 hover:bg-brand-50"
             }`}
           >
             All
@@ -55,22 +58,36 @@ const CoursesPage = () => {
               key={cat}
               type="button"
               onClick={() => setCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-sm ${
-                category === cat ? "bg-brand-500 text-white" : "bg-slate-100 dark:bg-slate-800"
+              className={`px-4 py-2 rounded-xl text-sm transition-all duration-300 ${
+                category === cat ? "bg-brand-500 text-white shadow-brand" : "bg-slate-100 dark:bg-slate-800 hover:bg-brand-50"
               }`}
             >
               {cat}
             </button>
           ))}
-        </div>
+        </ScrollReveal>
       )}
 
       {loading ? (
-        <p className="text-slate-500">Loading courses...</p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-slate-500"
+        >
+          Loading courses...
+        </motion.p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div
+          key={category || "all"}
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {courses.map((c) => (
-            <CourseCard key={c._id} course={c} />
+            <motion.div key={c._id} variants={staggerItem}>
+              <CourseCard course={c} />
+            </motion.div>
           ))}
           {!courses.length && (
             <EmptyState
@@ -78,7 +95,7 @@ const CoursesPage = () => {
               hint="We are preparing new courses. Please check back soon."
             />
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );

@@ -107,6 +107,73 @@
       mask-image: none;
       overflow: visible;
     }
+
+    .animate-float-gentle,
+    .animate-blob,
+    .animate-shimmer-line {
+      animation: none !important;
+    }
+  }
+
+  @keyframes float-gentle {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(2deg);
+    }
+  }
+
+  @keyframes blob-drift {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(24px, -18px) scale(1.05);
+    }
+    66% {
+      transform: translate(-16px, 12px) scale(0.98);
+    }
+  }
+
+  @keyframes shimmer-line {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
+
+  .animate-float-gentle {
+    animation: float-gentle 5s ease-in-out infinite;
+  }
+
+  .animate-blob {
+    animation: blob-drift 14s ease-in-out infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  .animate-shimmer-line {
+    animation: shimmer-line 2.8s ease-in-out infinite;
+  }
+
+  .trust-badge-pulse {
+    @apply relative overflow-hidden;
+  }
+
+  .trust-badge-pulse::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-line pointer-events-none;
   }
 
   /* Rich text editor (TipTap) — same font as site */

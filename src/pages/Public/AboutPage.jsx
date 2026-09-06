@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { FiBookOpen, FiUsers, FiVideo, FiAward } from "react-icons/fi";
 import Button from "../../components/common/Button";
+import ScrollReveal from "../../components/common/ScrollReveal";
 import { CONTACT } from "../../utils/constants";
+import { staggerContainer, staggerItem } from "../../utils/motion";
 
 const highlights = [
   {
@@ -28,7 +31,7 @@ const highlights = [
 
 const AboutPage = () => (
   <div className="section-container py-12 lg:py-20">
-    <div className="max-w-3xl">
+    <ScrollReveal className="max-w-3xl">
       <p className="text-sm font-medium text-brand-600 mb-2">About INDLearns</p>
       <h1 className="font-display text-3xl lg:text-5xl font-bold text-slate-900 dark:text-white leading-tight">
         Education that prepares you for the real world
@@ -38,77 +41,60 @@ const AboutPage = () => (
         hands-on assignments, and mentorship — not just recorded videos. We connect students,
         expert tutors, and institutions on one trusted learning system.
       </p>
-    </div>
+    </ScrollReveal>
 
-    <div className="mt-12 grid sm:grid-cols-2 gap-6">
+    <motion.div
+      className="mt-12 grid sm:grid-cols-2 gap-6"
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-40px" }}
+    >
       {highlights.map((item) => (
-        <div key={item.title} className="glass-card p-6">
-          <item.icon className="text-brand-600 mb-3" size={28} />
+        <motion.div key={item.title} variants={staggerItem} className="glass-card p-6 group">
+          <item.icon className="text-brand-600 mb-3 group-hover:scale-110 transition-transform duration-300" size={28} />
           <h2 className="font-bold text-lg">{item.title}</h2>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
             {item.text}
           </p>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
 
-    <div className="glass-card p-8 lg:p-10 mt-12 max-w-3xl">
+    <ScrollReveal className="glass-card p-8 lg:p-10 mt-12 max-w-3xl">
       <h2 className="font-display text-2xl font-bold mb-4">Our mission</h2>
       <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
         We believe quality education should be accessible, measurable, and connected to
         careers. INDLearns gives every learner a clear place to study, collaborate, and
         demonstrate progress — while giving tutors and administrators the tools to run batches,
-        schedules, and assessments professionally.
+        live classes, and assessments at scale.
       </p>
       <p className="text-slate-700 dark:text-slate-300 leading-relaxed mt-4">
-        Whether you are exploring courses for the first time or enrolled in a live batch,
-        we are here to support your journey with transparency, secure payments, and a
-        platform you can trust.
+        Whether you are starting a new skill, preparing for placements, or upskilling for your
+        next role, we are here to guide you with structured programs and human support.
       </p>
-    </div>
+    </ScrollReveal>
 
-    <div className="glass-card p-6 lg:p-8 mt-8 max-w-3xl">
-      <h2 className="font-bold text-lg mb-3">Get in touch</h2>
-      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-        Questions about courses, enrollment, or partnerships? Contact our team.
+    <ScrollReveal className="mt-12 max-w-3xl">
+      <h2 className="font-display text-2xl font-bold mb-4">Get in touch</h2>
+      <p className="text-slate-600 dark:text-slate-400 mb-6">
+        Questions about courses, partnerships, or batches? Reach us anytime.
       </p>
-      <div className="flex flex-col sm:flex-row flex-wrap gap-4 text-sm">
-        <a
-          href={`mailto:${CONTACT.email}`}
-          className="text-brand-600 hover:underline font-medium"
-        >
+      <div className="flex flex-wrap gap-4">
+        <Link to="/contact">
+          <Button>Contact us</Button>
+        </Link>
+        <Link to="/courses">
+          <Button variant="outline">Browse courses</Button>
+        </Link>
+      </div>
+      <p className="text-sm text-slate-500 mt-6">
+        Email:{" "}
+        <a href={`mailto:${CONTACT.email}`} className="text-brand-600 hover:underline">
           {CONTACT.email}
         </a>
-        <a href={`tel:${CONTACT.phoneTel}`} className="text-brand-600 hover:underline font-medium">
-          {CONTACT.phoneDisplay}
-        </a>
-        <a
-          href={CONTACT.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-brand-600 hover:underline font-medium"
-        >
-          LinkedIn
-        </a>
-        <a
-          href={CONTACT.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-brand-600 hover:underline font-medium"
-        >
-          Instagram
-        </a>
-      </div>
-    </div>
-
-    <div className="mt-12 flex flex-wrap gap-4">
-      <Link to="/courses">
-        <Button>Explore courses</Button>
-      </Link>
-      <Link to="/contact">
-        <Button variant="outline">Contact support</Button>
-      </Link>
-    </div>
+      </p>
+    </ScrollReveal>
   </div>
 );
 

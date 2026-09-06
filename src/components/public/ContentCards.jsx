@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { FiBookOpen, FiCalendar, FiBriefcase, FiArrowRight } from "react-icons/fi";
 import {
   getImageUrl,
@@ -10,13 +11,20 @@ import {
 } from "../../utils/media";
 import { getEventDetailPath, isHackathonEvent } from "../../utils/eventPaths";
 import { stripDescriptionMarkup } from "../../utils/descriptionFormat";
+import { cardHover } from "../../utils/motion";
 
 export const CourseCard = ({ course, compact }) => {
   const closed = isEnrollmentClosed(course);
   const detailUrl = `/courses/${course._id}`;
 
   return (
-    <div className="glass-card overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full group">
+    <motion.div
+      initial="rest"
+      whileHover="hover"
+      animate="rest"
+      variants={cardHover}
+      className="glass-card overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full group"
+    >
       <Link to={detailUrl} className="block flex-1">
         {course.thumbnail ? (
           <img
@@ -74,11 +82,12 @@ export const CourseCard = ({ course, compact }) => {
           </Link>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 export const WorkshopCard = ({ workshop, compact }) => (
+  <motion.div initial="rest" whileHover="hover" animate="rest" variants={cardHover}>
   <Link
     to={getEventDetailPath(workshop)}
     className="glass-card p-5 hover:shadow-lg transition-shadow block group h-full"
@@ -137,6 +146,7 @@ export const WorkshopCard = ({ workshop, compact }) => (
       </p>
     )}
   </Link>
+  </motion.div>
 );
 
 export const CompanyCard = ({ company }) => (

@@ -11,9 +11,14 @@ import {
   FiArrowRight,
   FiCheckCircle,
   FiUser,
+  FiShield,
 } from "react-icons/fi";
 import Button from "../../components/common/Button";
+import ScrollReveal from "../../components/common/ScrollReveal";
+import AnimatedCounter from "../../components/common/AnimatedCounter";
+import HeroDecor from "../../components/home/HeroDecor";
 import { FEATURES, STATS, APP_TAGLINE, ROLES } from "../../utils/constants";
+import { fadeUp, slideInLeft, slideInRight, staggerContainer, staggerItem, viewportOnce } from "../../utils/motion";
 import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
 import LearnersWorkAtMarquee from "../../components/public/LearnersWorkAtMarquee";
@@ -28,15 +33,6 @@ const iconMap = {
   community: FiUsers,
   mentor: FiMessageCircle,
   event: FiCalendar,
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5 },
-  }),
 };
 
 const HomePage = () => {
@@ -92,11 +88,12 @@ const HomePage = () => {
   return (
     <div>
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-hero-gradient dark:bg-none">
+        <HeroDecor />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-50/50 to-transparent dark:from-brand-950/30 pointer-events-none" />
         <div className="section-container relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 text-sm font-medium mb-6">
+            <motion.div initial="hidden" animate="visible" variants={slideInLeft}>
+              <span className="trust-badge-pulse inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 text-sm font-medium mb-6">
                 <FiCheckCircle /> Learn with live classes & expert tutors
               </span>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-950 dark:text-white leading-tight">
@@ -130,44 +127,65 @@ const HomePage = () => {
                   </>
                 ) : null}
               </div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.5 }}
+                className="mt-8 flex flex-wrap items-center gap-4 text-sm text-slate-500"
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <FiShield className="text-brand-500" /> Secure payments
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <FiVideo className="text-brand-500" /> Live mentor sessions
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <FiUsers className="text-brand-500" /> Trusted by learners
+                </span>
+              </motion.div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial="hidden"
+              animate="visible"
+              variants={slideInRight}
               className="relative hidden lg:block"
             >
-              <div className="glass-card p-8">
+              <div className="glass-card p-8 shadow-brand-lg">
                 <p className="text-sm font-semibold text-brand-600 mb-4">On IndLearn now</p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
+                <motion.div
+                  className="flex flex-wrap justify-center gap-4"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <motion.div variants={staggerItem} className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                     <FiBookOpen className="text-brand-600 mb-2" />
                     <p className="font-bold text-2xl">{counts?.courses ?? "—"}</p>
                     <p className="text-xs text-slate-500">Courses</p>
-                  </div>
+                  </motion.div>
                   {(counts?.workshops ?? 0) > 0 && (
-                    <div className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
+                    <motion.div variants={staggerItem} className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                       <FiCalendar className="text-accent-600 mb-2" />
                       <p className="font-bold text-2xl">{counts.workshops}</p>
                       <p className="text-xs text-slate-500">Workshops</p>
-                    </div>
+                    </motion.div>
                   )}
                   {(counts?.hackathons ?? 0) > 0 && (
-                    <div className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
+                    <motion.div variants={staggerItem} className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                       <FiAward className="text-violet-600 mb-2" />
                       <p className="font-bold text-2xl">{counts.hackathons}</p>
                       <p className="text-xs text-slate-500">Hackathons</p>
-                    </div>
+                    </motion.div>
                   )}
-                  <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
+                  <motion.div variants={staggerItem} className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
                     <FiVideo className="text-brand-600 mb-2" />
                     <p className="font-bold text-sm font-semibold text-slate-800 dark:text-slate-200">
                       Live & chat
                     </p>
                     <p className="text-xs text-slate-500">Built-in video + messaging</p>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -188,7 +206,7 @@ const HomePage = () => {
                 className="text-center min-w-[120px] sm:min-w-[140px]"
               >
                 <p className="font-display text-3xl lg:text-4xl font-bold text-brand-500 dark:text-brand-400">
-                  {stat.value}
+                  <AnimatedCounter value={stat.value} />
                 </p>
                 <p className="text-slate-600 dark:text-slate-400 mt-1">{stat.label}</p>
               </motion.div>
@@ -200,7 +218,7 @@ const HomePage = () => {
       {/* Featured open courses */}
       <section className="py-16 lg:py-20">
         <div className="section-container">
-          <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <ScrollReveal className="flex flex-wrap items-end justify-between gap-4 mb-8">
             <div>
               <h2 className="section-title text-slate-900 dark:text-white">Featured courses</h2>
               <p className="text-slate-600 dark:text-slate-400 mt-2">
@@ -210,10 +228,18 @@ const HomePage = () => {
             <Link to="/courses" className="text-brand-600 font-medium text-sm flex items-center gap-1">
               View all <FiArrowRight />
             </Link>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          </ScrollReveal>
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
             {home?.courses?.map((c) => (
-              <CourseCard key={c._id} course={c} compact />
+              <motion.div key={c._id} variants={staggerItem}>
+                <CourseCard course={c} compact />
+              </motion.div>
             ))}
             {!home?.courses?.length && (
               <EmptyState
@@ -221,7 +247,7 @@ const HomePage = () => {
                 hint="New open courses will appear here soon. Check back later."
               />
             )}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -361,14 +387,19 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="py-20">
+      <section className="py-20 lg:py-28">
         <div className="section-container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl bg-brand-gradient p-10 lg:p-16 text-center text-white shadow-brand-lg"
-          >
+          <ScrollReveal>
+            <motion.div
+              whileInView={{ scale: [0.98, 1] }}
+              viewport={viewportOnce}
+              transition={{ duration: 0.5 }}
+              className="relative overflow-hidden rounded-3xl bg-brand-gradient p-10 lg:p-16 text-center text-white shadow-brand-lg"
+            >
+              <div className="absolute inset-0 opacity-30 pointer-events-none">
+                <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white/20 blur-2xl animate-blob" />
+                <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full bg-white/15 blur-2xl animate-blob animation-delay-2000" />
+              </div>
             <h2 className="font-display text-3xl lg:text-4xl font-bold relative">
               Ready to Transform Your Career?
             </h2>
@@ -390,7 +421,8 @@ const HomePage = () => {
                 </Link>
               )}
             </div>
-          </motion.div>
+            </motion.div>
+          </ScrollReveal>
         </div>
       </section>
     </div>
