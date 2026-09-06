@@ -17,7 +17,8 @@ import Button from "../../components/common/Button";
 import ScrollReveal from "../../components/common/ScrollReveal";
 import AnimatedCounter from "../../components/common/AnimatedCounter";
 import HeroDecor from "../../components/home/HeroDecor";
-import { FEATURES, STATS, APP_TAGLINE, ROLES } from "../../utils/constants";
+import SectionBackground from "../../components/common/SectionBackground";
+import { FEATURES, APP_TAGLINE, ROLES } from "../../utils/constants";
 import { fadeUp, slideInLeft, slideInRight, staggerContainer, staggerItem, viewportOnce } from "../../utils/motion";
 import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
@@ -65,7 +66,8 @@ const HomePage = () => {
   const tutorShowcase = home?.tutorShowcase ?? [];
 
   const counts = home?.counts;
-  const dynamicStats = counts
+  const statsReady = Boolean(counts);
+  const dynamicStats = statsReady
     ? [
         { value: `${counts.courses}+`, label: "Open courses" },
         ...(counts.workshops > 0
@@ -76,7 +78,7 @@ const HomePage = () => {
           : []),
         { value: "24/7", label: "Learning support" },
       ]
-    : STATS;
+    : [];
 
   const dashPath =
     user?.role === ROLES.TUTOR
@@ -93,7 +95,7 @@ const HomePage = () => {
         <div className="section-container relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={slideInLeft}>
-              <span className="trust-badge-pulse inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 text-sm font-medium mb-6">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 text-sm font-medium mb-6">
                 <FiCheckCircle /> Learn with live classes & expert tutors
               </span>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-950 dark:text-white leading-tight">
@@ -192,25 +194,39 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="py-12 bg-white dark:bg-[#0F2340]/50 border-y border-brand-100 dark:border-brand-900/50">
-        <div className="section-container">
-          <div className="flex flex-wrap justify-center items-start gap-x-10 sm:gap-x-14 lg:gap-x-20 gap-y-8">
-            {dynamicStats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                className="text-center min-w-[120px] sm:min-w-[140px]"
-              >
-                <p className="font-display text-3xl lg:text-4xl font-bold text-brand-500 dark:text-brand-400">
-                  <AnimatedCounter value={stat.value} />
-                </p>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">{stat.label}</p>
-              </motion.div>
-            ))}
+      <section className="relative py-12 bg-white dark:bg-[#0F2340]/50 border-y border-brand-100 dark:border-brand-900/50 overflow-hidden">
+        <SectionBackground variant="stats" />
+        <div className="section-container relative">
+          <div className="flex flex-wrap justify-center items-start gap-x-10 sm:gap-x-14 lg:gap-x-20 gap-y-8 min-h-[88px]">
+            {!statsReady ? (
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="text-center min-w-[120px] animate-pulse">
+                  <div className="h-10 w-16 bg-brand-100 dark:bg-brand-900/40 rounded-lg mx-auto" />
+                  <div className="h-4 w-24 bg-slate-100 dark:bg-slate-800 rounded mt-3 mx-auto" />
+                </div>
+              ))
+            ) : (
+              dynamicStats.map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  className="text-center min-w-[120px] sm:min-w-[140px]"
+                >
+                  <p className="font-display text-3xl lg:text-4xl font-bold text-brand-500 dark:text-brand-400">
+                    {stat.value === "24/7" ? (
+                      stat.value
+                    ) : (
+                      <AnimatedCounter value={stat.value} />
+                    )}
+                  </p>
+                  <p className="text-slate-600 dark:text-slate-400 mt-1">{stat.label}</p>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -252,8 +268,9 @@ const HomePage = () => {
       </section>
 
       {homeWorkshops.length > 0 && (
-        <section className="py-16 bg-slate-50/80 dark:bg-slate-900/30">
-          <div className="section-container">
+        <section className="relative py-16 bg-slate-50/80 dark:bg-slate-900/30 overflow-hidden">
+          <SectionBackground variant="default" />
+          <div className="section-container relative">
             <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
               <div>
                 <h2 className="section-title text-slate-900 dark:text-white">Upcoming workshops</h2>
@@ -348,8 +365,9 @@ const HomePage = () => {
         </section>
       )}
 
-      <section className="py-20 lg:py-28">
-        <div className="section-container">
+      <section className="relative py-20 lg:py-28 overflow-hidden">
+        <SectionBackground variant="features" />
+        <div className="section-container relative">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="section-title text-slate-900 dark:text-white">
               Everything You Need to Succeed

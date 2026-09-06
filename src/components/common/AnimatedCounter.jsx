@@ -1,28 +1,43 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useInView, useReducedMotion } from "framer-motion";
 
 const parseNumericStat = (value) => {
   const str = String(value ?? "").trim();
-  if (!str || str.includes("/")) return null;
+  if (!str || str.includes("/") || /[KMB]/i.test(str)) return null;
+
   const match = str.match(/^([\d,]+(?:\.\d+)?)(.*)$/);
   if (!match) return null;
+
   const numeric = Number(match[1].replace(/,/g, ""));
   if (Number.isNaN(numeric)) return null;
+
   return { numeric, suffix: match[2] || "" };
 };
 
-const AnimatedCounter = ({ value, className = "", duration = 1.4 }) => {
+/**
+ * Counts up once when scrolled into view. Stable — no re-run on parent re-renders.
+ */
+const AnimatedCounter = ({ value, className = "", duration = 1.2 }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const reduceMotion = useReducedMotion();
-  const parsed = parseNumericStat(value);
-  const [display, setDisplay] = useState(parsed ? 0 : value);
+  const parsed = useMemo(() => parseNumericStat(value), [value]);
+  const animKey = useMemo(() => String(value ?? ""), [value]);
+  const finishedKey = useRef(null);
+  const [display, setDisplay] = useState(() => (parsed ? 0 : value));
 
   useEffect(() => {
-    if (!parsed || !inView || reduceMotion) {
+    if (!parsed || reduceMotion) {
       setDisplay(value);
+      finishedKey.current = animKey;
       return;
     }
+
+    if (!inView) return;
+    if (finishedKey.current === animKey) return;
+
+    finishedKey.current = animKey;
+    setDisplay(0);
 
     let frame;
     const start = performance.now();
@@ -32,12 +47,14 @@ const AnimatedCounter = ({ value, className = "", duration = 1.4 }) => {
       const progress = Math.min((now - start) / (duration * 1000), 1);
       const eased = 1 - (1 - progress) ** 3;
       setDisplay(Math.round(target * eased));
-      if (progress < 1) frame = requestAnimationFrame(tick);
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick);
+      }
     };
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [inView, parsed, value, duration, reduceMotion]);
+  }, [animKey, inView, parsed, value, duration, reduceMotion]);
 
   if (!parsed || reduceMotion) {
     return (
@@ -48,10 +65,10 @@ const AnimatedCounter = ({ value, className = "", duration = 1.4 }) => {
   }
 
   return (
-    <motion.span ref={ref} className={className} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }}>
+    <span ref={ref} className={`tabular-nums ${className}`}>
       {display}
       {parsed.suffix}
-    </motion.span>
+    </span>
   );
 };
 
