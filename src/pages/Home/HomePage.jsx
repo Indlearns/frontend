@@ -179,10 +179,10 @@ const HomePage = () => {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mt-4 lg:mt-0"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mt-8 lg:mt-0 lg:pl-4"
             >
               <HeroShowcase counts={counts} />
             </motion.div>

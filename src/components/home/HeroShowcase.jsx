@@ -3,114 +3,105 @@ import {
   FiBookOpen,
   FiVideo,
   FiAward,
-  FiUsers,
   FiCalendar,
   FiMessageCircle,
+  FiUsers,
 } from "react-icons/fi";
+import { staggerContainer, staggerItem } from "../../utils/motion";
 
-const orbitBadges = [
-  { Icon: FiVideo, label: "Live class", tone: "text-accent-600 bg-accent-500/15 border-accent-200/50" },
-  { Icon: FiAward, label: "Hackathons", tone: "text-violet-600 bg-violet-500/15 border-violet-200/50" },
-  { Icon: FiUsers, label: "Mentors", tone: "text-brand-700 bg-brand-500/15 border-brand-200/50" },
-  { Icon: FiMessageCircle, label: "Chat", tone: "text-sky-600 bg-sky-500/15 border-sky-200/50" },
+const featurePills = [
+  { Icon: FiVideo, label: "Live classes" },
+  { Icon: FiAward, label: "Hackathons" },
+  { Icon: FiUsers, label: "Expert mentors" },
+  { Icon: FiMessageCircle, label: "Tutor chat" },
 ];
 
 const HeroShowcase = ({ counts }) => {
   const reduceMotion = useReducedMotion();
+  const workshops = counts?.workshops ?? 0;
+  const hackathons = counts?.hackathons ?? 0;
 
   return (
-    <div className="relative w-full max-w-[480px] mx-auto lg:mx-0 lg:ml-auto min-h-[340px] sm:min-h-[380px] lg:min-h-[420px]">
-      {/* Glow behind hub */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-brand-400/25 dark:bg-brand-500/15 blur-3xl animate-hero-glow" />
+    <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
+      <div
+        className="absolute -inset-3 rounded-3xl bg-brand-400/12 dark:bg-brand-500/8 blur-2xl pointer-events-none"
+        aria-hidden
+      />
 
-      {/* Rotating dashed ring */}
-      {!reduceMotion && (
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] rounded-full border-2 border-dashed border-brand-400/35 dark:border-brand-500/25"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 48, repeat: Infinity, ease: "linear" }}
-        />
-      )}
-
-      {/* Orbiting badges — rotate as a ring, labels stay upright */}
-      {!reduceMotion && (
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-0 h-0 z-[5]"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-        >
-          {orbitBadges.map(({ Icon, label, tone }, i) => (
-            <div
-              key={label}
-              className="absolute left-0 top-0"
-              style={{
-                transform: `rotate(${i * 90}deg) translateX(125px) rotate(${-i * 90}deg)`,
-              }}
-            >
-              <div
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-md backdrop-blur-sm whitespace-nowrap ${tone}`}
-              >
-                <Icon size={16} />
-                <span className="text-xs font-semibold">{label}</span>
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Center hub */}
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
-        animate={reduceMotion ? {} : { y: [0, -10, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="relative glass-card p-6 sm:p-8 shadow-brand-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        {...(reduceMotion ? {} : { whileHover: { y: -3, transition: { duration: 0.25 } } })}
       >
-        <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-brand-gradient shadow-brand-lg flex flex-col items-center justify-center text-white">
-          <FiBookOpen size={36} className="mb-1" />
-          <span className="text-xs font-bold tracking-wide">IndLearn</span>
-          {!reduceMotion && (
-            <span className="absolute inset-0 rounded-full border-2 border-white/30 animate-ping-slow opacity-60" />
+        <p className="text-sm font-semibold text-brand-600 mb-4">On IndLearn now</p>
+
+        <motion.div
+          className="flex flex-wrap justify-center gap-3 sm:gap-4"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div
+            variants={staggerItem}
+            className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.375rem)] min-w-[130px] max-w-[170px]"
+          >
+            <FiBookOpen className="text-brand-600 mb-2" size={20} />
+            <p className="font-bold text-2xl tabular-nums">{counts?.courses ?? "—"}</p>
+            <p className="text-xs text-slate-500">Courses</p>
+          </motion.div>
+
+          {workshops > 0 && (
+            <motion.div
+              variants={staggerItem}
+              className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30 w-[calc(50%-0.375rem)] min-w-[130px] max-w-[170px]"
+            >
+              <FiCalendar className="text-accent-600 mb-2" size={20} />
+              <p className="font-bold text-2xl tabular-nums">{workshops}</p>
+              <p className="text-xs text-slate-500">Workshops</p>
+            </motion.div>
           )}
-        </div>
+
+          {hackathons > 0 && (
+            <motion.div
+              variants={staggerItem}
+              className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30 w-[calc(50%-0.375rem)] min-w-[130px] max-w-[170px]"
+            >
+              <FiAward className="text-violet-600 mb-2" size={20} />
+              <p className="font-bold text-2xl tabular-nums">{hackathons}</p>
+              <p className="text-xs text-slate-500">Hackathons</p>
+            </motion.div>
+          )}
+
+          <motion.div
+            variants={staggerItem}
+            className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.375rem)] min-w-[130px] max-w-[170px]"
+          >
+            <FiVideo className="text-brand-600 mb-2" size={20} />
+            <p className="font-bold text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+              Live & chat
+            </p>
+            <p className="text-xs text-slate-500 mt-1">Video + messaging</p>
+          </motion.div>
+        </motion.div>
       </motion.div>
 
-      {/* Stats card — floats below hub */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 glass-card p-5 sm:p-6 shadow-brand-lg border-brand-200/50 dark:border-brand-700/40"
-        initial={{ opacity: 0, y: 24 }}
-        animate={
-          reduceMotion
-            ? { opacity: 1, y: 0 }
-            : { opacity: 1, y: [0, -6, 0] }
-        }
-        transition={
-          reduceMotion
-            ? { delay: 0.35, duration: 0.6 }
-            : {
-                opacity: { delay: 0.35, duration: 0.6 },
-                y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 },
-              }
-        }
+        className="flex flex-wrap justify-center gap-2 mt-4 px-1"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.45, duration: 0.4 }}
       >
-        <p className="text-sm font-semibold text-brand-600 mb-3">On IndLearn now</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 rounded-xl bg-brand-500/10 border border-brand-200/30">
-            <FiBookOpen className="text-brand-600 mb-1" size={18} />
-            <p className="font-bold text-xl tabular-nums">{counts?.courses ?? "—"}</p>
-            <p className="text-xs text-slate-500">Courses</p>
-          </div>
-          <div className="p-3 rounded-xl bg-accent-500/10 border border-brand-200/30">
-            <FiCalendar className="text-accent-600 mb-1" size={18} />
-            <p className="font-bold text-xl tabular-nums">{counts?.workshops ?? counts?.hackathons ?? "—"}</p>
-            <p className="text-xs text-slate-500">Events</p>
-          </div>
-          <div className="col-span-2 p-3 rounded-xl bg-violet-500/10 border border-brand-200/30 flex items-center gap-3">
-            <FiVideo className="text-violet-600 shrink-0" size={20} />
-            <div>
-              <p className="font-semibold text-sm text-slate-800 dark:text-slate-200">Live classes & chat</p>
-              <p className="text-xs text-slate-500">Learn with mentors in real time</p>
-            </div>
-          </div>
-        </div>
+        {featurePills.map(({ Icon, label }) => (
+          <span
+            key={label}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/90 dark:bg-slate-900/70 border border-brand-100 dark:border-brand-800 text-slate-600 dark:text-slate-300"
+          >
+            <Icon size={13} className="text-brand-500 shrink-0" />
+            {label}
+          </span>
+        ))}
       </motion.div>
     </div>
   );
