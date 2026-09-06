@@ -111,7 +111,14 @@
     .animate-float-gentle,
     .animate-blob,
     .animate-shimmer-line,
-    .animate-wave-drift {
+    .animate-wave-drift,
+    .animate-mesh-shift,
+    .animate-hero-glow,
+    .animate-orbit,
+    .animate-particle-float,
+    .animate-gradient-text,
+    .animate-ping-slow,
+    .text-brand-gradient-animated {
       animation: none !important;
     }
   }
@@ -178,8 +185,113 @@
     }
   }
 
+  @keyframes mesh-shift {
+    0%,
+    100% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes hero-glow {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      opacity: 0.85;
+      transform: translate(-50%, -50%) scale(1.12);
+    }
+  }
+
+  @keyframes orbit-spin {
+    from {
+      transform: rotate(0deg) translateX(130px) rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg) translateX(130px) rotate(-360deg);
+    }
+  }
+
+  @keyframes particle-float {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 0.35;
+    }
+    50% {
+      transform: translateY(-18px) scale(1.2);
+      opacity: 0.75;
+    }
+  }
+
+  @keyframes gradient-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes ping-slow {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    70%,
+    100% {
+      transform: scale(1.25);
+      opacity: 0;
+    }
+  }
+
   .animate-wave-drift {
     animation: wave-drift 12s ease-in-out infinite;
+  }
+
+  .animate-mesh-shift {
+    animation: mesh-shift 10s ease-in-out infinite;
+  }
+
+  .animate-hero-glow {
+    animation: hero-glow 4s ease-in-out infinite;
+  }
+
+  .animate-orbit {
+    animation: orbit-spin 24s linear infinite;
+  }
+
+  .animate-particle-float {
+    animation: particle-float 4s ease-in-out infinite;
+  }
+
+  .animate-gradient-text {
+    background-size: 200% auto;
+    animation: gradient-shift 5s ease-in-out infinite;
+  }
+
+  .animate-ping-slow {
+    animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .text-brand-gradient-animated {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(
+      90deg,
+      #58c4f6 0%,
+      #2d89ef 35%,
+      #0056b3 70%,
+      #58c4f6 100%
+    );
+    background-size: 200% auto;
+    animation: gradient-shift 4s ease-in-out infinite;
   }
 
   .bg-edu-mesh {

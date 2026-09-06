@@ -17,9 +17,10 @@ import Button from "../../components/common/Button";
 import ScrollReveal from "../../components/common/ScrollReveal";
 import AnimatedCounter from "../../components/common/AnimatedCounter";
 import HeroDecor from "../../components/home/HeroDecor";
+import HeroShowcase from "../../components/home/HeroShowcase";
 import SectionBackground from "../../components/common/SectionBackground";
 import { FEATURES, APP_TAGLINE, ROLES } from "../../utils/constants";
-import { fadeUp, slideInLeft, slideInRight, staggerContainer, staggerItem, viewportOnce } from "../../utils/motion";
+import { fadeUp, staggerContainer, staggerItem, viewportOnce } from "../../utils/motion";
 import { publicService } from "../../services/publicService";
 import { CourseCard, WorkshopCard, EmptyState } from "../../components/public/ContentCards";
 import LearnersWorkAtMarquee from "../../components/public/LearnersWorkAtMarquee";
@@ -34,6 +35,22 @@ const iconMap = {
   community: FiUsers,
   mentor: FiMessageCircle,
   event: FiCalendar,
+};
+
+const heroIntro = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+  },
+};
+
+const heroLine = {
+  hidden: { opacity: 0, y: 22 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 const HomePage = () => {
@@ -89,24 +106,40 @@ const HomePage = () => {
 
   return (
     <div>
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-hero-gradient dark:bg-none">
+      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-hero-gradient dark:bg-brand-gradient-soft">
         <HeroDecor />
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-50/50 to-transparent dark:from-brand-950/30 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-50/40 to-transparent dark:from-brand-950/20 pointer-events-none" />
         <div className="section-container relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div initial="hidden" animate="visible" variants={slideInLeft}>
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 text-sm font-medium mb-6">
-                <FiCheckCircle /> Learn with live classes & expert tutors
-              </span>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-950 dark:text-white leading-tight">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+            <motion.div variants={heroIntro} initial="hidden" animate="visible">
+              <motion.span
+                variants={heroLine}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100/90 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 text-sm font-medium mb-6 shadow-sm border border-brand-200/50 dark:border-brand-800/50"
+              >
+                <motion.span
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="inline-flex"
+                >
+                  <FiCheckCircle />
+                </motion.span>
+                Learn with live classes & expert tutors
+              </motion.span>
+              <motion.h1
+                variants={heroLine}
+                className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-950 dark:text-white leading-tight"
+              >
                 Build Your Future with{" "}
-                <span className="text-brand-gradient">World-Class Learning</span>
-              </h1>
-              <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
+                <span className="text-brand-gradient-animated">World-Class Learning</span>
+              </motion.h1>
+              <motion.p
+                variants={heroLine}
+                className="mt-6 text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed"
+              >
                 {APP_TAGLINE}. Explore open courses and upcoming workshops — no login required to
                 browse. Sign in to enroll via Zoho Payments, join live classes, and chat with tutors.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
+              </motion.p>
+              <motion.div variants={heroLine} className="mt-8 flex flex-wrap gap-4">
                 <Link to="/courses">
                   <Button>
                     Explore Courses <FiArrowRight />
@@ -128,11 +161,9 @@ const HomePage = () => {
                     </Link>
                   </>
                 ) : null}
-              </div>
+              </motion.div>
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45, duration: 0.5 }}
+                variants={heroLine}
                 className="mt-8 flex flex-wrap items-center gap-4 text-sm text-slate-500"
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -148,47 +179,12 @@ const HomePage = () => {
             </motion.div>
 
             <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={slideInRight}
-              className="relative hidden lg:block"
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mt-4 lg:mt-0"
             >
-              <div className="glass-card p-8 shadow-brand-lg">
-                <p className="text-sm font-semibold text-brand-600 mb-4">On IndLearn now</p>
-                <motion.div
-                  className="flex flex-wrap justify-center gap-4"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <motion.div variants={staggerItem} className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
-                    <FiBookOpen className="text-brand-600 mb-2" />
-                    <p className="font-bold text-2xl">{counts?.courses ?? "—"}</p>
-                    <p className="text-xs text-slate-500">Courses</p>
-                  </motion.div>
-                  {(counts?.workshops ?? 0) > 0 && (
-                    <motion.div variants={staggerItem} className="p-4 rounded-xl bg-accent-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
-                      <FiCalendar className="text-accent-600 mb-2" />
-                      <p className="font-bold text-2xl">{counts.workshops}</p>
-                      <p className="text-xs text-slate-500">Workshops</p>
-                    </motion.div>
-                  )}
-                  {(counts?.hackathons ?? 0) > 0 && (
-                    <motion.div variants={staggerItem} className="p-4 rounded-xl bg-violet-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
-                      <FiAward className="text-violet-600 mb-2" />
-                      <p className="font-bold text-2xl">{counts.hackathons}</p>
-                      <p className="text-xs text-slate-500">Hackathons</p>
-                    </motion.div>
-                  )}
-                  <motion.div variants={staggerItem} className="p-4 rounded-xl bg-brand-500/10 border border-brand-200/30 w-[calc(50%-0.5rem)] min-w-[140px] max-w-[180px]">
-                    <FiVideo className="text-brand-600 mb-2" />
-                    <p className="font-bold text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      Live & chat
-                    </p>
-                    <p className="text-xs text-slate-500">Built-in video + messaging</p>
-                  </motion.div>
-                </motion.div>
-              </div>
+              <HeroShowcase counts={counts} />
             </motion.div>
           </div>
         </div>
