@@ -37,9 +37,19 @@ export const adminService = {
       responseType: "blob",
     }),
 
-  createWorkshop: (data) => api.post("/admin/workshops", data).then((r) => r.data),
+  createWorkshop: (formData) =>
+    api
+      .post("/admin/workshops", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data),
   getWorkshops: () => api.get("/admin/workshops").then((r) => r.data),
-  updateWorkshop: (id, data) => api.put(`/admin/workshops/${id}`, data).then((r) => r.data),
+  updateWorkshop: (id, formData) =>
+    api
+      .put(`/admin/workshops/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data),
   deleteWorkshop: (id) => api.delete(`/admin/workshops/${id}`).then((r) => r.data),
 
   createCompany: (data) => api.post("/admin/companies", data).then((r) => r.data),

@@ -7,6 +7,7 @@ import PurchaseButton from "../../components/payment/PurchaseButton";
 import PurchaseStatus from "../../components/payment/PurchaseStatus";
 import { usePurchase } from "../../hooks/usePurchase";
 import {
+  getImageUrl,
   formatPrice,
   formatRegistrationCloseDate,
   isRegistrationClosed,
@@ -64,6 +65,14 @@ const WorkshopDetailContent = ({ workshop, onReload }) => {
           />
         )}
       </div>
+
+      {workshop.thumbnail && (
+        <img
+          src={getImageUrl(workshop.thumbnail)}
+          alt={workshop.title}
+          className="w-full max-h-80 object-cover rounded-2xl mt-6 border border-brand-100"
+        />
+      )}
 
       {workshop.description && (
         <div className="mt-6">

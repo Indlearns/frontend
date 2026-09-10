@@ -87,65 +87,77 @@ export const CourseCard = ({ course, compact }) => {
 };
 
 export const WorkshopCard = ({ workshop, compact }) => (
-  <motion.div initial="rest" whileHover="hover" animate="rest" variants={cardHover}>
-  <Link
-    to={getEventDetailPath(workshop)}
-    className="glass-card p-5 hover:shadow-lg transition-shadow block group h-full"
+  <motion.div
+    initial="rest"
+    whileHover="hover"
+    animate="rest"
+    variants={cardHover}
+    className="glass-card overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full group"
   >
-    <div className="flex items-start justify-between gap-2">
-      <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-          isHackathonEvent(workshop)
-            ? "bg-violet-500/15"
-            : "bg-accent-500/15"
-        }`}
-      >
-        <FiCalendar
-          className={
-            isHackathonEvent(workshop)
-              ? "text-violet-600 dark:text-violet-400"
-              : "text-accent-600 dark:text-accent-400"
-          }
+    <Link to={getEventDetailPath(workshop)} className="block flex-1">
+      {workshop.thumbnail ? (
+        <img
+          src={getImageUrl(workshop.thumbnail)}
+          alt=""
+          className="w-full h-40 object-cover"
         />
-      </div>
-      <span className="text-sm font-bold text-brand-600">
-        {formatPrice(workshop.price, workshop.currency)}
-      </span>
-    </div>
-    <h3 className="font-bold text-lg mt-3 text-slate-900 dark:text-white group-hover:text-brand-600">
-      {workshop.title}
-    </h3>
-    {isHackathonEvent(workshop) ? (
-      <span className="text-xs capitalize text-violet-600 font-medium">Hackathon</span>
-    ) : (
-      <span className="text-xs capitalize text-accent-600">Workshop</span>
-    )}
-    {!compact && workshop.description && (
-      <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">
-        {stripDescriptionMarkup(workshop.description)}
-      </p>
-    )}
-    <p className="text-xs text-slate-500 mt-3">
-      {new Date(workshop.date).toLocaleDateString(undefined, {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-      })}
-      {workshop.startTime && ` · ${workshop.startTime}`}
-      {workshop.endTime && `–${workshop.endTime}`}
-    </p>
-    {workshop.registrationCloseDate && (
-      <p className="text-xs mt-1">
-        {isRegistrationClosed(workshop) ? (
-          <span className="text-red-600">Registration closed</span>
-        ) : (
-          <span className="text-amber-700">
-            Closes {formatRegistrationCloseDate(workshop.registrationCloseDate)}
+      ) : (
+        <div
+          className={`w-full h-40 flex items-center justify-center ${
+            isHackathonEvent(workshop) ? "bg-violet-500/10" : "bg-accent-500/10"
+          }`}
+        >
+          <FiCalendar
+            className={
+              isHackathonEvent(workshop)
+                ? "text-violet-600 dark:text-violet-400"
+                : "text-accent-600 dark:text-accent-400"
+            }
+            size={40}
+          />
+        </div>
+      )}
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-sm font-bold text-brand-600">
+            {formatPrice(workshop.price, workshop.currency)}
           </span>
+          {isHackathonEvent(workshop) ? (
+            <span className="text-xs capitalize text-violet-600 font-medium">Hackathon</span>
+          ) : (
+            <span className="text-xs capitalize text-accent-600">Workshop</span>
+          )}
+        </div>
+        <h3 className="font-bold text-lg mt-2 text-slate-900 dark:text-white group-hover:text-brand-600">
+          {workshop.title}
+        </h3>
+        {!compact && workshop.description && (
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">
+            {stripDescriptionMarkup(workshop.description)}
+          </p>
         )}
-      </p>
-    )}
-  </Link>
+        <p className="text-xs text-slate-500 mt-3">
+          {new Date(workshop.date).toLocaleDateString(undefined, {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          })}
+          {workshop.startTime && ` · ${workshop.startTime}`}
+          {workshop.endTime && `–${workshop.endTime}`}
+        </p>
+        {workshop.registrationCloseDate && (
+          <p className="text-xs mt-1">
+            {isRegistrationClosed(workshop) ? (
+              <span className="text-red-600">Registration closed</span>
+            ) : (
+              <span className="text-amber-700">
+                Closes {formatRegistrationCloseDate(workshop.registrationCloseDate)}
+              </span>
+            )}
+          </p>
+        )}
+      </div>
+    </Link>
   </motion.div>
 );
 

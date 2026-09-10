@@ -7,6 +7,7 @@ import DescriptionEditor from "../../components/admin/DescriptionEditor";
 import { isHackathonEvent } from "../../utils/eventPaths";
 import { isPubliclyVisibleWorkshop } from "../../utils/workshopVisibility";
 import {
+  getImageUrl,
   formatPrice,
   formatRegistrationCloseDate,
   isFreePrice,
@@ -33,6 +34,8 @@ const WorkshopsPage = () => {
   const [listTab, setListTab] = useState(initialTab);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,9 +48,27 @@ const WorkshopsPage = () => {
     load();
   }, []);
 
+  const buildFormData = () => {
+    const fd = new FormData();
+    fd.append("title", form.title);
+    fd.append("description", form.description);
+    fd.append("eventType", form.eventType);
+    fd.append("date", form.date);
+    fd.append("startTime", form.startTime);
+    fd.append("endTime", form.endTime);
+    fd.append("meetLink", form.meetLink);
+    fd.append("status", form.status);
+    fd.append("price", String(form.price || 0));
+    fd.append("registrationCloseDate", form.registrationCloseDate || "");
+    if (imageFile) fd.append("image", imageFile);
+    return fd;
+  };
+
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setImageFile(null);
+    setPreview("");
     setError("");
   };
 
@@ -65,8 +86,20 @@ const WorkshopsPage = () => {
       price: workshop.price != null ? String(workshop.price) : "",
       registrationCloseDate: toDateInputValue(workshop.registrationCloseDate),
     });
+    setImageFile(null);
+    setPreview(workshop.thumbnail ? getImageUrl(workshop.thumbnail) : "");
     setError("");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    setImageFile(file || null);
+    if (file) setPreview(URL.createObjectURL(file));
+    else if (editingId) {
+      const workshop = workshops.find((w) => w._id === editingId);
+      setPreview(workshop?.thumbnail ? getImageUrl(workshop.thumbnail) : "");
+    } else setPreview("");
   };
 
   const handleSubmit = async (e) => {
@@ -74,13 +107,9 @@ const WorkshopsPage = () => {
     setError("");
     setLoading(true);
     try {
-      const payload = {
-        ...form,
-        price: Number(form.price) || 0,
-      };
       const r = editingId
-        ? await adminService.updateWorkshop(editingId, payload)
-        : await adminService.createWorkshop(payload);
+        ? await adminService.updateWorkshop(editingId, buildFormData())
+        : await adminService.createWorkshop(buildFormData());
       if (r.success) {
         resetForm();
         load();
@@ -135,6 +164,28 @@ const WorkshopsPage = () => {
             )}
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
+          <div>
+            <label className="block text-sm font-medium mb-1">Event image</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleImageChange}
+              className="input-field"
+            />
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-2 h-32 w-full object-cover rounded-xl border border-brand-100"
+              />
+            )}
+            {editingId && !imageFile && (
+              <p className="text-xs text-slate-500 mt-1">Leave empty to keep the current image.</p>
+            )}
+            <p className="text-xs text-slate-500 mt-1">
+              JPG, PNG, WebP or GIF · max 5 MB · recommended 1280×720 px.
+            </p>
+          </div>
           <input
             required
             placeholder="Title"
@@ -245,12 +296,22 @@ const WorkshopsPage = () => {
             {filteredList.map((w) => (
               <li
                 key={w._id}
-                className={`p-4 rounded-xl border ${
+                className={`p-4 rounded-xl border flex flex-wrap gap-3 ${
                   editingId === w._id
                     ? "border-brand-500 bg-brand-50/50 dark:bg-brand-950/20"
                     : "border-brand-100"
                 }`}
               >
+                {w.thumbnail ? (
+                  <img
+                    src={getImageUrl(w.thumbnail)}
+                    alt=""
+                    className="w-20 h-20 rounded-lg object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-lg bg-brand-100 shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
                 <p className="font-semibold">{w.title}</p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   <span className="text-sm text-slate-500 capitalize">{w.eventType}</span>
@@ -292,6 +353,7 @@ const WorkshopsPage = () => {
                   >
                     Delete
                   </button>
+                </div>
                 </div>
               </li>
             ))}
