@@ -18,10 +18,16 @@ export const CONTACT = {
   phone: "9606991651",
   phoneTel: "+919606991651",
   phoneDisplay: "+91 96069 91651",
-  address: "1-1077, Kilasagiri Colony, Srikalahasti, Andhra Pradesh - 517644",
+  /** Digits only — used for wa.me / WhatsApp Business */
+  whatsappNumber: "919606991651",
+  whatsappDefaultMessage: "Hi INDLearns, I would like to get in touch.",
   linkedin: "https://www.linkedin.com/company/indlearns",
   instagram: "https://www.instagram.com/ind.learns",
 };
+
+/** Open WhatsApp chat with optional pre-filled message */
+export const getWhatsAppUrl = (message = CONTACT.whatsappDefaultMessage) =>
+  `https://wa.me/${CONTACT.whatsappNumber}?text=${encodeURIComponent(message)}`;
 
 export const SOCIAL_LINKS = [
   {

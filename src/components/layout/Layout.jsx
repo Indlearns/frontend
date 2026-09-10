@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import StudentEnrollBanner from "../student/StudentEnrollBanner";
 import PageTransition from "../common/PageTransition";
+import WhatsAppFloat from "../common/WhatsAppFloat";
 
 /**
  * Main layout wrapper - Navbar + page content + Footer
@@ -19,6 +20,7 @@ const Layout = () => {
         </PageTransition>
       </main>
       <Footer />
+      <WhatsAppFloat />
     </div>
   );
 };

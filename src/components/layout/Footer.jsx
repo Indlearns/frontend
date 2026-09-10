@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { FiLinkedin, FiMail, FiPhone, FiInstagram } from "react-icons/fi";
 import Logo from "../common/Logo";
-import { APP_NAME, CONTACT, SOCIAL_LINKS } from "../../utils/constants";
+import { APP_NAME, CONTACT, SOCIAL_LINKS, getWhatsAppUrl } from "../../utils/constants";
+import { FaWhatsapp } from "react-icons/fa";
 import {
   filterPublicNavLinks,
   usePublicEventAvailability,
@@ -76,6 +77,15 @@ const Footer = () => {
                 <FiPhone size={16} className="shrink-0" />
                 {CONTACT.phoneDisplay}
               </a>
+              <a
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-brand-200/90 hover:text-white transition-colors"
+              >
+                <FaWhatsapp size={16} className="shrink-0 text-[#25D366]" />
+                WhatsApp
+              </a>
             </div>
 
             <div className="flex gap-3 mt-6">
@@ -100,6 +110,15 @@ const Footer = () => {
                 aria-label="Email us"
               >
                 <FiMail size={18} />
+              </a>
+              <a
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-lg bg-brand-900 hover:bg-[#25D366] text-brand-200 hover:text-white transition-colors"
+                aria-label="Chat on WhatsApp"
+              >
+                <FaWhatsapp size={18} />
               </a>
             </div>
           </div>

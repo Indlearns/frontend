@@ -88,11 +88,19 @@ const AboutPage = () => (
           <Button variant="outline">Browse courses</Button>
         </Link>
       </div>
-      <p className="text-sm text-slate-500 mt-6">
-        Email:{" "}
-        <a href={`mailto:${CONTACT.email}`} className="text-brand-600 hover:underline">
-          {CONTACT.email}
-        </a>
+      <p className="text-sm text-slate-500 mt-6 space-y-1">
+        <span className="block">
+          Email:{" "}
+          <a href={`mailto:${CONTACT.email}`} className="text-brand-600 hover:underline">
+            {CONTACT.email}
+          </a>
+        </span>
+        <span className="block">
+          Phone:{" "}
+          <a href={`tel:${CONTACT.phoneTel}`} className="text-brand-600 hover:underline">
+            {CONTACT.phoneDisplay}
+          </a>
+        </span>
       </p>
     </ScrollReveal>
   </div>

@@ -92,7 +92,7 @@ export const privacyPolicy = {
         "For any privacy-related concerns, contact:",
         `Email: ${CONTACT.email}`,
         `Phone: ${CONTACT.phoneDisplay}`,
-        "INDLearns",
+        `WhatsApp: ${CONTACT.phoneDisplay}`,
       ],
     },
   ],
@@ -243,7 +243,7 @@ export const refundPolicy = {
     {
       heading: "7. Contact for Refunds",
       paragraphs: [
-        `For refund-related requests, contact: ${CONTACT.email} or call ${CONTACT.phoneDisplay}.`,
+        `For refund-related requests, contact: ${CONTACT.email}, call ${CONTACT.phoneDisplay}, or message us on WhatsApp at ${CONTACT.phoneDisplay}.`,
         "Include: Full Name, Registered Email Address, Transaction ID, Course Name, and Reason for Request.",
       ],
     },
